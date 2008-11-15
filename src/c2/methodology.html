@@ -1,0 +1,48 @@
+<html>
+	<head>
+		<title>Census - RIA Data Loading Benchmarks</title>
+	</head>
+	<body>
+		<h4>Setup:</h4>
+		<p>
+		This benchmark suite attempts to isolate client performance in
+		rendering large amounts of business data. The server does little more
+		than shovel easily computed data to clients in whatever format they
+		request it, therefore no database is used and no artificial business
+		logic is introduced which might skew the client-side rendering
+		outcomes.
+		</p>
+		<h4>The Tests:</h4>
+		<p>
+		Each test is run (by default) 5 times. The outlier results (highest and
+		lowest) are discarded and the remaining result times are averaged to
+		genereate the displayed results. We do this to ensure that caches in
+		the JVM, web server, browser JavaScript VM and HTTP caches, Flash
+		engine, and servlet engine caches are warmed up such that the first
+		test to run is not punished simply for being first. Tests are run
+		multiple times to ensure that real-world performance (loading an
+		application and then subsequently interacting with it for some long-ish
+		period of time).
+		</p>
+		<p>
+		Tests are run in iframes in an attempt to isolate them from the hosting
+		browser environment. This is, clearly, not perfect. Variability in
+		performance can be introduced by many browser-level issues, so we
+		recommend that you run these tests with any in-browser debugging aids
+		(particularly Firebug) disabled.
+		</p>
+		<h4>Getting Involved:</h4>
+		<p>
+		Census 2 is an Open Source project. Please see the "HACKING.txt" file
+		to get started with modifying the code. You can submit bugs, feature
+		requests, and patches <a href="http://code.google.com/p/census2/"
+		target="_blank">at the Google Code project page</a> and get the latest
+		sources.
+		</p>
+		<p>
+		<b>Copyright (C) 2008 <a href="http://alex.dojotoolkit.org">Alex Russell</a></b><br>
+		Parts Copyright (C) 2007 <a href="http://jamesward.com">James Ward</a><br>
+		All original parts of this application are licensed under GPLv2.
+		</p>
+	</body>
+</html>

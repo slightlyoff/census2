@@ -1,0 +1,413 @@
+<!--
+Copyright (C) 2007 James Ward
+http://www.jamesward.org
+
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+Modified Nov 2008, Alex Russell
+-->
+<html>
+<head>
+	<title>Census - RIA Data Loading Benchmarks</title>
+	<link rel="stylesheet" href="resources/main.css" type="text/css">
+	<link rel="stylesheet" href="dojo/dojo/resources/dojo.css" type="text/css">
+	<link rel="stylesheet" href="dojo/dijit/themes/dijit.css" type="text/css">
+	<link rel="stylesheet" href="dojo/dijit/themes/tundra/tundra.css" type="text/css">
+	<!--
+	<link rel="stylesheet" href="dojo/dojox/layout/resources/ExpandoPane.css" type="text/css">
+	-->
+	<link rel="stylesheet" href="resources/census.css" type="text/css">
+	<style type="text/css">
+	</style>
+	<!-- grab the core of Dojo -->
+	<script src="dojo/dojo/dojo.js" language="javascript"
+		djConfig="parseOnLoad: true"></script>
+	<!--
+		the census.js layer file includes nearly all of the dependencies for
+		this page, making most of the following require() statements simple
+		formalities (and no-ops)
+	-->
+	<script src="dojo/dojo/census.js" language="javascript"></script>
+	<script type="text/javascript">
+		// dojo dependencies
+		dojo.require("dijit.dijit");
+		dojo.require("dijit.layout.ContentPane");
+		dojo.require("dijit.layout.BorderContainer");
+		dojo.require("dijit.layout.TabContainer");
+		dojo.require("dijit.form.CheckBox");
+		dojo.require("dijit.form.Button");
+		dojo.require("dojox.widget.Iterator");
+		dojo.require("dojox.charting.Chart2D");
+		dojo.require("dojox.charting.widget.Legend");
+		dojo.require("dojox.lang.functional.sequence");
+		dojo.require("dojox.charting.Theme");
+
+		// color groups:
+		colorGroups = [
+			[ "#e28741", "#c6691c" ],
+			[ "#467299", "#2a547a" ],
+			[ "#f6c54c", "#d8a62d" ],
+			[ "#ff3f20", "#c92719" ],
+			[ "#44aa77", "#339966", "#246d49" ],
+			[ "#dd0000", "#990000", "#6d0000" ] // memory
+		];
+
+
+		// define a new theme based on our color group
+		DarkHorse = new dojox.charting.Theme({
+			chart: { fill: "transparent" },
+			plotarea: { fill: "#151515" },
+			axis: {
+				stroke:	{ //	the axis itself
+					color: "#111111", width: 1
+				},
+				fontColor: "#a9a9a9",
+				font: "normal normal normal 12px HelveticaNeue-Light",
+				fill: "#a9a9a9"
+			},
+			colors: dojo.map(colorGroups, "return item[0];")
+		});
+
+		// a quick class to describe test items. Items in the global "testList"
+		// are instances of this class
+		dojo.declare("Test", null, {
+			constructor: function(item){
+				if(item){
+					dojo.mixin(this, item);
+				}
+			},
+			name: "",
+			file: "",
+			desc: "",
+			serverExecTime: 0,
+			transferTime: 0,
+			parseTime: 0,
+			renderTime: 0,
+			bandwidth: 0,
+			total: 0
+		});
+
+		runSelected = function(all){
+			var items = all ? tests.children :
+				dojo.filter(tests.children, "return item.checkbox.checked;");
+			runTests(dojo.map(items, "return item.file"));
+		}
+
+		runTests = function(testFiles){
+			dojo.forEach(testFiles, "console.debug(item);");
+			if(testFiles.length){
+				dojo.byId("testContent").src = testFiles[0];
+			}
+		}
+
+		reportResults = function(file, properties){
+			if(!testList){ return; }
+			if(!properties){ return; }
+			var tl = dojo.filter(testList, function(i){ return i.file == file; });
+			if(!tl.length){
+				console.debug("no matching test registered for:", file);
+			}
+			dojo.forEach(tl, function(t){
+				for(var x in properties){
+					console.debug(x, properties[x]);
+				}
+				dojo.mixin(t, properties);
+			});
+
+			updateCharts();
+		}
+
+		testList = null;
+
+		setTestList = function(list){
+			list = dojo.map(list, "return new Test(item);");
+			tests.onDataAvailable(list);
+
+			// upgrade the items in the list to hold slots for their data:
+			testList = list.reverse();
+
+			/*
+			// for old browsers
+			dojo.query(".censusTable tr").
+				onmouseenter(function(e){
+					console.debug(this);
+					dojo.addClass(this, "censusTrHover");
+				}).
+				onmouseleave(function(e){
+					console.debug(this);
+					dojo.removeClass(this, "censusTrHover");
+				});
+			*/
+
+			// visual axis configurationsshared between the bandwidth and
+			// timing charts
+
+			var xAxisConfig = {
+				majorLabels: true, 
+				minorLabels: true, 
+				includeZero: true, 
+				minorTicks: false, 
+				microTicks: false, 
+				htmlLabels: true,
+				fixUpper: "major", fixLower: "major", 
+				majorTick: { length: 3 }
+			};
+
+			var yAxisConfig = {
+				vertical: true,  // this is the vertical axis
+				fixLower: "none", // don't make space at the bottom
+				fixUpper: "none", // ...or the top of the graph
+				natural: true,
+				majorTickStep: 1, // show all the labels
+				htmlLabels: true, // and use HTML to do it so we get the right fonts and such
+				includeZero: false, // don't include the 0th item 
+				majorTick: { length: 0 }, // and squelch those unsightly tick marks
+				labels: dojo.map(testList, "return { value: index+1, text: item.name };")
+			};
+
+			var chartHeight = 250;
+
+			// create and configure the initial charts
+			perfChart = new dojox.charting.Chart2D("perfChart").
+				setTheme(DarkHorse).
+				addAxis("x", xAxisConfig).
+				addAxis("y", yAxisConfig).
+				addPlot("default", { 
+					type: "StackedBars", 
+					minBarSize: 3,
+					maxBarSize: 3,
+					gap: 3
+				}).
+				addSeries(
+					"Server Exec Time", 
+					dojo.map(testList, "return item.serverExecTime;"),
+					{
+						stroke: { width: 0 } // , 
+						/*
+						fill: {
+							type: "linear",
+							x1: 0, y1: 0,
+							x2: 0, y2: chartHeight,
+							colors: [
+								{ color: "#e28741", offset: 0 },
+								{ color: "#c6691c", offset: 1 }
+							]
+						}
+						*/
+					}
+				).
+				addSeries(
+					"Transfer Time", 
+					dojo.map(testList, "return item.transferTime;"),
+					{ stroke: { width: 0 } }
+				).
+				addSeries(
+					"Parse Time", 
+					dojo.map(testList, "return item.parseTime;"),
+					{ stroke: { width: 0 } }
+				).
+				addSeries(
+					"Render Time", 
+					dojo.map(testList, "return item.renderTime;"),
+					{ stroke: { width: 0 } }
+				).
+			render();
+
+			/*
+			// hack for gradients
+			var run = chart.runs[name];
+			var group = run.group;
+			dojo.forEach(group.children, function(rect){
+				var bbox = rect.getBoundingBox();
+				// set your gradient using absolute coordinates
+				rect.setFill(yourFancyFill);
+			});
+			*/
+			perfLegend = new dojox.charting.widget.Legend({ chart: perfChart }, "perfLegend");
+
+			bandChart = new dojox.charting.Chart2D("bandChart").
+				setTheme(DarkHorse).
+				addAxis("x", xAxisConfig).
+				addAxis("y", yAxisConfig).
+					addPlot("default", { 
+					type: "Bars", 
+					minBarSize: 3,
+					maxBarSize: 3,
+					gap: 3
+				}).
+				addSeries("Bandwidth", 
+					dojo.map(testList, "return item.bandwidth;"),
+					{ stroke: { width: 0 } }
+				).
+			render();
+
+			bandLegend = new dojox.charting.widget.Legend({ chart: bandChart }, "bandLegend");
+
+			totalTimeChart = new dojox.charting.Chart2D("totalTimeChart").
+				setTheme(DarkHorse).
+				addAxis("x", xAxisConfig).
+				addAxis("y", yAxisConfig).
+					addPlot("default", { 
+					type: "Bars", 
+					minBarSize: 3,
+					maxBarSize: 3,
+					gap: 3
+				}).
+				addSeries("Total Test Time", 
+					dojo.map(testList, "return item.total;"),
+					{ stroke: { width: 0 } }
+				).
+			render();
+
+			totalTimeLegend = new dojox.charting.widget.Legend({ chart: totalTimeChart }, "totalTimeLegend");
+		}
+
+		updateCharts = function(){
+			perfChart.
+				updateSeries("Server Exec Time", 
+					dojo.map(testList, "return item.serverExecTime;")).
+				updateSeries("Transfer Time", 
+					dojo.map(testList, "return item.transferTime;")).
+				updateSeries("Parse Time", 
+					dojo.map(testList, "return item.parseTime;")).
+				updateSeries("Render Time", 
+					dojo.map(testList, "return item.renderTime;")).
+			render();
+			perfLegend.refresh();
+
+			bandChart.
+				updateSeries("Bandwidth", 
+					dojo.map(testList, "return item.bandwidth;")).
+			render();
+			bandLegend.refresh();
+
+			totalTimeChart.
+				updateSeries("Total Test Time", 
+					dojo.map(testList, "return item.total;")).
+			render();
+			totalTimeLegend.refresh();
+		}
+
+		dojo.addOnLoad(function(){
+
+			// get the list of tests and populate things accordingly
+			dojo.xhrGet({
+				url: "tests.json",
+				handleAs: "json",
+				load: setTestList
+			});
+		});
+	</script>
+</head>
+<body class="tundra census">
+	<!-- we use a BorderContainer for the main page layout -->
+	<div dojoType="dijit.layout.BorderContainer" id="main">
+		<!-- 
+			tabs for the left-hand panel. We use CSS to remove the "tab"
+			appearance but since we're using the Dojo tab class, we'll get to
+			keep all of the accessibility behavior and keyboard handling
+		-->
+		<div dojoType="dijit.layout.TabContainer" 
+			tabPosition="top" splitter="true" region="left"
+			style="width: 270px;" class="mainPane leftContainer">
+
+			<!-- the "Guide Me" UI -->
+			<div dojoType="dijit.layout.ContentPane" title="Guide Me">
+				<button dojoType="dijit.form.Button" onClick="runSelected(true);"
+					style="width: 100%;">
+					Run 'Em All
+				</button>
+			</div>
+
+			<!-- the "Navigator" UI -->
+			<div dojoType="dijit.layout.ContentPane" title="Navigator" class="tests">
+				<button dojoType="dijit.form.Button" onClick="runSelected();">
+					Run Selected Tests
+				</button>
+				<table class="censusTable" cellspacing="0">
+					<tbody>
+						<tr dojoType="dojox.widget.Iterator" jsId="tests" id="tests">
+							<td class="checkbox" style="width: 20px;">
+								<div dojoType="dijit.form.CheckBox"
+									dojoAttachPoint="checkbox">${file}</div>
+							</td>
+							<td class="name" style="width: 100px;">${name}</td>
+							<td class="desc">${desc}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<!-- the "Help" UI, loaded externally on demand -->
+			<div dojoType="dijit.layout.ContentPane" 
+				title="Help" id="help" href="help.html">
+			</div>
+		</div>
+
+		<!-- a tab container for the charting and test output UI -->
+		<div dojoType="dijit.layout.TabContainer" attachParent="true" tabPosition="bottom"
+			region="center" class="mainPane">
+
+			<!-- charts -->
+			<div dojoType="dijit.layout.ContentPane" title="Charts" 
+				style="overflow-x: hidden; overflow-y: auto;">
+
+				<div id="perfLegend" style="width: 100%; height: 50px;"></div>
+				<div id="perfChart" style="width: 100%; height: 250px;"></div>
+				<div id="bandLegend" style="width: 100%; height: 50px;"></div>
+				<div id="bandChart" style="width: 100%; height: 250px;"></div>
+				<div id="totalTimeLegend" style="width: 100%; height: 50px;"></div>
+				<div id="totalTimeChart" style="width: 100%; height: 250px;"></div>
+				<script type="dojo/connect" event="resize" args="size">
+					// resize the charts if our outer size changes
+					if(this._resizeTimer){
+						clearTimeout(this._resizeTimer);
+					}
+					if(perfChart && perfChart.resize){
+						// keep the height but change the width
+						this._resizeTimer = setTimeout(function(){
+							perfChart.resize(size.w-10, 250);
+							bandChart.resize(size.w-10, 250);
+							totalTimeChart.resize(size.w-10, 250);
+						}, 50);
+					}
+				</script>
+			</div>
+
+			<!-- test output (if any) -->
+			<div dojoType="dijit.layout.ContentPane" 
+				title="Output" jsId="output"
+				style="padding: 0px; margin; 0px; border: none;">
+				<iframe id="testContent" src="blank.html"
+					style="padding: 0px; margin; 0px; border: none;"></iframe>
+				<script type="dojo/connect" event="resize" args="size">
+					// make sure our iframe resizes to fit whatever size we've been given
+					dojo.style("testContent", {
+						width: size.w,
+						height: size.h
+					});
+				</script>
+			</div>
+
+			<div dojoType="dijit.layout.ContentPane" 
+				title="Methodology" href="methodology.html"
+				style="padding: 0px; margin; 0px; border: none;">
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

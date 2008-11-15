@@ -1,0 +1,61 @@
+@font-face {
+	font-family: "Vera";
+	src: url("Vera.ttf") format("truetype");
+}
+
+@font-face {
+	font-family: "Vera";
+	src: url("VeraBold.ttf") format("truetype");
+	font-weight: bold;
+}
+
+html, body {
+    font-family: "Myriad Web Pro", HelveticaNeue-Light, Vera, Helvetica, Arial, sans-serif;
+    font-size: 11px;
+    margin: 0px;
+    background-color: #1a1a1a;
+}
+
+td {
+    font-family: "Myriad Web Pro", HelveticaNeue-Light, Vera, Helvetica, Arial, sans-serif;
+    color: #bbbbbb;
+    font-size: 11px;
+}
+
+th {
+    font-family: "Myriad Web Pro", HelveticaNeue-Light, Vera, Helvetica, Arial, sans-serif;
+    font-size: 11px;
+}
+
+h1 {
+    font-family: "Myriad Web Pro", HelveticaNeue-Light, Vera, Helvetica, Arial, sans-serif;
+    color: #bbbbbb;
+    font-size: 14px;
+}
+
+h2 {
+    font-family: "Myriad Web Pro", HelveticaNeue-Light, Vera, Helvetica, Arial, sans-serif;
+    color: #bbbbbb;
+    font-size: 12px;
+}
+
+#grid {
+	position: absolute;
+	top:0px;
+	left:0px;
+	height: 100%;
+	width: 100%;
+}
+
+#dataTable {
+	width: 100%;
+	table-layout: fixed;
+}
+
+#dataTable tbody tr {
+    background-color: #1a1a1a;
+}
+
+#dataTable tbody tr:hover {
+    background-color: #363636;
+}
