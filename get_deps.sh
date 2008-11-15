@@ -6,6 +6,18 @@ FLEX_SDK_NAME="flex_sdk_"$FLEX_VERSION"_mpl.zip"
 
 # export _JAVA_OPTIONS="-Xms512m -Xmx1g"
 
+function getFile {
+	echo $1
+	if [[ -x `which wget` ]]; then
+		wget $1
+	else
+		if [[ -x `which curl` ]]; then
+			curl -O $1
+		fi
+	fi
+}
+
+
 echo "setting up dependencies"
 
 if [[ ! -d src/flex_sdk ]]
@@ -14,7 +26,7 @@ then
 	echo "	downloading the Open Source Flex SDK..."
 	mkdir flex_sdk
 	cd flex_sdk
-	wget "http://flexorg.wip3.adobe.com/flexsdk/$FLEX_VERSION/$FLEX_SDK_NAME"
+	getFile "http://flexorg.wip3.adobe.com/flexsdk/$FLEX_VERSION/$FLEX_SDK_NAME"
 	unzip $FLEX_SDK_NAME
 	rm $FLEX_SDK_NAME
 	cd ..
@@ -29,7 +41,7 @@ then
 	if [[ ! -d dojo_src ]]
 	then
 		echo "	downloading Dojo..."
-		wget http://download.dojotoolkit.org/release-$DOJO_VERSION/dojo-release-$DOJO_VERSION-src.zip
+		getFile http://download.dojotoolkit.org/release-$DOJO_VERSION/dojo-release-$DOJO_VERSION-src.zip
 		unzip dojo-release-$DOJO_VERSION-src.zip
 		mv dojo-release-$DOJO_VERSION-src dojo_src
 		rm dojo-release-$DOJO_VERSION-src.zip
@@ -65,3 +77,5 @@ then
 
 	cd ..
 fi
+
+echo "done!"
