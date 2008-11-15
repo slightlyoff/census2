@@ -8,6 +8,8 @@
 	timing = {
 		_timings: {},
 		_sizes: {},
+		_totalTimeName: "total",
+		_initStart: now(),
 		_testName: (new dojo._Url(window.location)).path.split("/").pop(),
 		setTestName: function(name){
 			this._testName = name||this._testName;
@@ -39,6 +41,7 @@
 			this._sizes[name] = value;
 		},
 		report: function(){
+			this.setTime(this._totalTimeName, (now()-this._initStart));
 			var p = window.parent;
 			if(p == window){
 				console.debug("can't report to parent window!");

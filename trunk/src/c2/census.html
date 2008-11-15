@@ -75,7 +75,7 @@ Modified Nov 2008, Alex Russell
 					color: "#111111", width: 1
 				},
 				fontColor: "#a9a9a9",
-				font: "normal normal normal 12px HelveticaNeue-Light",
+				font: "normal normal normal 11px HelveticaNeue-Light",
 				fill: "#a9a9a9"
 			},
 			colors: dojo.map(colorGroups, "return item[0];")
@@ -366,11 +366,11 @@ Modified Nov 2008, Alex Russell
 				style="overflow-x: hidden; overflow-y: auto;">
 
 				<div id="perfLegend" style="width: 100%; height: 50px;"></div>
-				<div id="perfChart" style="width: 100%; height: 250px;"></div>
+				<div id="perfChart" style="width: 100%; height: 200px;"></div>
 				<div id="bandLegend" style="width: 100%; height: 50px;"></div>
-				<div id="bandChart" style="width: 100%; height: 250px;"></div>
+				<div id="bandChart" style="width: 100%; height: 200px;"></div>
 				<div id="totalTimeLegend" style="width: 100%; height: 50px;"></div>
-				<div id="totalTimeChart" style="width: 100%; height: 250px;"></div>
+				<div id="totalTimeChart" style="width: 100%; height: 200px;"></div>
 				<script type="dojo/connect" event="resize" args="size">
 					// resize the charts if our outer size changes
 					if(this._resizeTimer){
@@ -379,9 +379,9 @@ Modified Nov 2008, Alex Russell
 					if(perfChart && perfChart.resize){
 						// keep the height but change the width
 						this._resizeTimer = setTimeout(function(){
-							perfChart.resize(size.w-10, 250);
-							bandChart.resize(size.w-10, 250);
-							totalTimeChart.resize(size.w-10, 250);
+							perfChart.resize(size.w-10, 200);
+							bandChart.resize(size.w-10, 200);
+							totalTimeChart.resize(size.w-10, 200);
 						}, 50);
 					}
 				</script>
