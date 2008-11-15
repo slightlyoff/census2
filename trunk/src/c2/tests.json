@@ -1,0 +1,67 @@
+[
+	{
+		"name": "Ajax: HTML",
+		"desc": "Server-built HTML table",
+		"file": "ajax_html.html"
+	},
+	{
+		"name": "Ajax: XML",
+		"desc": "XML to HTML table",
+		"file": "ajax_xml.html"
+	},
+	{
+		"name": "Ajax: XML via XSLT",
+		"desc": "XML to HTML table via XSLT",
+		"file": "ajax_xml_xslt.html"
+	},
+	{
+		"name": "Ajax: JSON",
+		"desc": "JSON to HTML table",
+		"file": "ajax_json.html"
+	},
+	{
+		"name": "Ajax: SOAP",
+		"desc": "SOAP to HTML table",
+		"file": "ajax_soap.html"
+	},
+	{
+		"name": "Dojo: JSON",
+		"desc": "JSON to Dojo Grid",
+		"file": "dojo_json.html"
+	},
+	{
+		"name": "Dojo: QRS",
+		"desc": "Dojo Grid via QueryReadStore",
+		"file": "dojo_QueryReadStore.html"
+	},
+	{
+		"name": "Flex: SOAP AS",
+		"desc": "SOAP to ActionScript objects",
+		"file": "flex_soap_as.html"
+	},
+	{
+		"name": "Flex: SOAP E4X",
+		"desc": "SOAP to E4X objects",
+		"file": "flex_soap_e4x.html"
+	},
+	{
+		"name": "Flex: XML AS",
+		"desc": "XML to ActionScript objects",
+		"file": "flex_xml_as.html"
+	},
+	{
+		"name": "Flex: XML E4X",
+		"desc": "XML to E4X objects",
+		"file": "flex_xml_e4x.html"
+	},
+	{
+		"name": "Flex: AMF3",
+		"desc": "RemoteObject via AMF3",
+		"file": "flex_amf3.html"
+	},
+	{
+		"name": "Flex: Paged",
+		"desc": "Flex DataService with paging",
+		"file": "flex_paged.html"
+	},
+]

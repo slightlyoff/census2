@@ -1,0 +1,119 @@
+html, body, #main {
+	width: 100%;	/* make the body expand to fill the visible window */
+	height: 100%;
+	overflow: hidden;	/* erase window level scrollbars */
+	padding: 0;
+	margin: 0;
+}
+
+body, #main {
+	color: #a9a9a9;
+	background-color: black;
+}
+
+#main {
+	 padding: 10px;
+}
+
+a {
+	color: #dfdfdf;
+}
+
+.census .mainPane {
+	background-color: #1a1a1a;
+	padding: 10px;
+	border: 1px solid #2a2a2a;
+
+	-moz-border-radius-bottomleft: 3px;
+	-webkit-border-bottom-left-radius: 3px;
+	-moz-border-radius-bottomright: 3px;
+	-webkit-border-bottom-right-radius: 3px;
+
+}
+
+.census .leftContainer .dijitTabPane {
+	font-size: 1em;
+	line-height: 1.2em;
+	background-color: #151515;
+	border: 1px solid #111111;
+}
+
+.census .dijitTabContainerTop-tabs,
+.census .dijitTabContainerBottom-tabs
+{
+	background-color: #1a1a1a;
+	/* border-color: #434343; */
+	border-color: #2a2a2a;
+}
+
+.census .dijitContentPane {
+	background-color: #1a1a1a;
+}
+
+.census .dijitTab {
+	font-size: 1.2em;
+	line-height: 1.4em;
+	background: transparent none;
+	border: 0px;
+	/*
+	font-weight: bold;
+	*/
+	color: #434343;
+}
+
+.census .dijitTabChecked {
+	color: #b8b8b8;
+}
+
+.census .dijitTabPaneWrapper {
+	background: transparent none;
+	border: none;
+}
+
+.census .dijitSplitter,
+.census .dijitSplitterV .dijitSplitterThumb {
+	width: 3px;
+	background: black none;
+}
+
+.censusTable {
+	width: 100%;
+	table-layout: fixed;
+	background-color: #151515;
+}
+
+.censusTable td {
+	font-size: 0.8em;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	margin: 0px;
+	padding: 2px;
+}
+
+.censusTable td.name{
+	font-weight: bold;
+}
+
+.censusTrNormal,
+.censusTable tr {
+	/*
+	background-color: #1a1a1a;
+	*/
+}
+
+.censusTrHover,
+.censusTable tr:hover {
+	background-color: #363636;
+}
+
+.census .dojoxLegendNode {
+	padding-left: 4em;
+}
+
+.census .dojoxLegendText {
+	padding-right: 1em;
+	font-size: 1.1em;
+}
+
+
