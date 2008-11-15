@@ -26,9 +26,6 @@ Modified Nov 2008, Alex Russell
 	<link rel="stylesheet" href="dojo/dojo/resources/dojo.css" type="text/css">
 	<link rel="stylesheet" href="dojo/dijit/themes/dijit.css" type="text/css">
 	<link rel="stylesheet" href="dojo/dijit/themes/tundra/tundra.css" type="text/css">
-	<!--
-	<link rel="stylesheet" href="dojo/dojox/layout/resources/ExpandoPane.css" type="text/css">
-	-->
 	<link rel="stylesheet" href="resources/census.css" type="text/css">
 	<style type="text/css">
 	</style>
@@ -54,6 +51,14 @@ Modified Nov 2008, Alex Russell
 		dojo.require("dojox.charting.widget.Legend");
 		dojo.require("dojox.lang.functional.sequence");
 		dojo.require("dojox.charting.Theme");
+
+		// TODO:
+		//		* revise census layer with added dependencies
+		//		* add a 'raw data' view of test results (in a grid?)
+		//		* a progress meter of some sort to give visual feedback of individual tests
+		//		* finish the "guided" pane
+		//		* provide a UI to tweak the # of times a given test is run
+		//		* theme buttons and drop-downs
 
 		// color groups:
 		colorGroups = [
@@ -81,36 +86,119 @@ Modified Nov 2008, Alex Russell
 			colors: dojo.map(colorGroups, "return item[0];")
 		});
 
+		sum = function(list){
+			var s = 0;
+			dojo.forEach(list, function(i){ s += i; });
+			return s;
+		}
+		mean = function(list, property){
+			if(!list.length){ return 0; }
+			return (sum(dojo.map(list, function(i){ return i[property]||0; }))/list.length); 
+		}
+
 		// a quick class to describe test items. Items in the global "testList"
 		// are instances of this class
 		dojo.declare("Test", null, {
 			constructor: function(item){
+				this.averages = dojo.delegate(Test.prototype.averages);
 				if(item){
 					dojo.mixin(this, item);
 				}
+				this.testInit();
+			},
+			_results: [],
+			testInit: function(){
+				this._results = [];
+			},
+			_currentlyRunning: null,
+			report: function(properties){
+				this._killFlightTimer();
+				// add our results to the list and re-generate the averages
+				this._results.push(properties);
+				if(this._currentlyRunning){
+					this._currentlyRunning.callback(properties);
+				}
+				var dataItems;
+				if(this._results.length > 2){
+					// calculate the current running averages
+					this._results.sort(function(a, b){
+						a.total - b.total;
+					});
+					dataItems = this._results.slice(1, -1);
+					for(var x in this.averages){
+						this.averages[x] = mean(dataItems, x);
+					};
+				}
+			},
+
+			testCount: 5, // how many times to run a given test
+			timeout: 30000, // thirty seconds is the default timeout for each test run
+
+			_inFlightTests: [],
+			_flightTimer: null,
+			_doTestRun: function(){
+				dojo.byId("testContent").src = this.file;
+			},
+			_killFlightTimer: function(){
+				if(this._inFlightTimer){
+					clearTimeout(this._inFlightTimer);
+					this._inFlightTimer = null;
+				}
+			},
+			_killRunning: function(){
+				if(this._currentlyRunning){
+					if(this._currentlyRunning.fired < 0){
+						this._currentlyRunning.errback(false);
+					}
+				}
+			},
+			addTests: function(list){
+				dojo.forEach((new Array(this.testCount)), function(i, idx){
+					// the list will always have at least a head Deferred
+					var last = list[list.length-1];
+					var def = new dojo.Deferred();
+					var runner = dojo.hitch(this, function(){
+						this._killFlightTimer();
+						this._killRunning();
+						this._currentlyRunning = def;
+						this._doTestRun();
+					});
+					last.addBoth(runner);
+					list.push(def);
+				}, this);
 			},
 			name: "",
 			file: "",
 			desc: "",
-			serverExecTime: 0,
-			transferTime: 0,
-			parseTime: 0,
-			renderTime: 0,
-			bandwidth: 0,
-			total: 0
+
+			// test averages
+			averages: {
+				serverExecTime: 0,
+				transferTime: 0,
+				parseTime: 0,
+				renderTime: 0,
+				bandwidth: 0,
+				total: 0
+			}
 		});
 
 		runSelected = function(all){
 			var items = all ? tests.children :
 				dojo.filter(tests.children, "return item.checkbox.checked;");
-			runTests(dojo.map(items, "return item.file"));
+			if(!testList){ return; } // FIXME: report to user!
+			runTests(dojo.filter(testList, function(t){
+				return dojo.some(items, function(i){ return i.file == t.file; });
+			}));
 		}
 
-		runTests = function(testFiles){
-			dojo.forEach(testFiles, "console.debug(item);");
-			if(testFiles.length){
-				dojo.byId("testContent").src = testFiles[0];
-			}
+		runTests = function(tests){
+			var first = new dojo.Deferred();
+			var tl = [ first ];
+			dojo.forEach(tests, function(t){
+				t.testInit();
+				t.addTests(tl);
+			});
+			first.callback(true);
 		}
 
 		reportResults = function(file, properties){
@@ -120,19 +208,14 @@ Modified Nov 2008, Alex Russell
 			if(!tl.length){
 				console.debug("no matching test registered for:", file);
 			}
-			dojo.forEach(tl, function(t){
-				for(var x in properties){
-					console.debug(x, properties[x]);
-				}
-				dojo.mixin(t, properties);
-			});
-
+			dojo.forEach(tl, function(t){ t.report(properties); });
 			updateCharts();
 		}
 
 		testList = null;
 
 		setTestList = function(list){
+			try{
 			list = dojo.map(list, "return new Test(item);");
 			tests.onDataAvailable(list);
 
@@ -178,7 +261,7 @@ Modified Nov 2008, Alex Russell
 				labels: dojo.map(testList, "return { value: index+1, text: item.name };")
 			};
 
-			var chartHeight = 250;
+			var chartHeight = 225;
 
 			// create and configure the initial charts
 			perfChart = new dojox.charting.Chart2D("perfChart").
@@ -193,7 +276,7 @@ Modified Nov 2008, Alex Russell
 				}).
 				addSeries(
 					"Server Exec Time", 
-					dojo.map(testList, "return item.serverExecTime;"),
+					dojo.map(testList, "return item.averages.serverExecTime;"),
 					{
 						stroke: { width: 0 } // , 
 						/*
@@ -211,17 +294,17 @@ Modified Nov 2008, Alex Russell
 				).
 				addSeries(
 					"Transfer Time", 
-					dojo.map(testList, "return item.transferTime;"),
+					dojo.map(testList, "return item.averages.transferTime;"),
 					{ stroke: { width: 0 } }
 				).
 				addSeries(
 					"Parse Time", 
-					dojo.map(testList, "return item.parseTime;"),
+					dojo.map(testList, "return item.averages.parseTime;"),
 					{ stroke: { width: 0 } }
 				).
 				addSeries(
 					"Render Time", 
-					dojo.map(testList, "return item.renderTime;"),
+					dojo.map(testList, "return item.averages.renderTime;"),
 					{ stroke: { width: 0 } }
 				).
 			render();
@@ -249,7 +332,7 @@ Modified Nov 2008, Alex Russell
 					gap: 3
 				}).
 				addSeries("Bandwidth", 
-					dojo.map(testList, "return item.bandwidth;"),
+					dojo.map(testList, "return item.averages.bandwidth;"),
 					{ stroke: { width: 0 } }
 				).
 			render();
@@ -267,36 +350,37 @@ Modified Nov 2008, Alex Russell
 					gap: 3
 				}).
 				addSeries("Total Test Time", 
-					dojo.map(testList, "return item.total;"),
+					dojo.map(testList, "return item.averages.total;"),
 					{ stroke: { width: 0 } }
 				).
 			render();
 
 			totalTimeLegend = new dojox.charting.widget.Legend({ chart: totalTimeChart }, "totalTimeLegend");
+			}catch(e){ console.debug(e); }
 		}
 
 		updateCharts = function(){
 			perfChart.
 				updateSeries("Server Exec Time", 
-					dojo.map(testList, "return item.serverExecTime;")).
+					dojo.map(testList, "return item.averages.serverExecTime;")).
 				updateSeries("Transfer Time", 
-					dojo.map(testList, "return item.transferTime;")).
+					dojo.map(testList, "return item.averages.transferTime;")).
 				updateSeries("Parse Time", 
-					dojo.map(testList, "return item.parseTime;")).
+					dojo.map(testList, "return item.averages.parseTime;")).
 				updateSeries("Render Time", 
-					dojo.map(testList, "return item.renderTime;")).
+					dojo.map(testList, "return item.averages.renderTime;")).
 			render();
 			perfLegend.refresh();
 
 			bandChart.
 				updateSeries("Bandwidth", 
-					dojo.map(testList, "return item.bandwidth;")).
+					dojo.map(testList, "return item.averages.bandwidth;")).
 			render();
 			bandLegend.refresh();
 
 			totalTimeChart.
 				updateSeries("Total Test Time", 
-					dojo.map(testList, "return item.total;")).
+					dojo.map(testList, "return item.averages.total;")).
 			render();
 			totalTimeLegend.refresh();
 		}
@@ -366,11 +450,11 @@ Modified Nov 2008, Alex Russell
 				style="overflow-x: hidden; overflow-y: auto;">
 
 				<div id="perfLegend" style="width: 100%; height: 50px;"></div>
-				<div id="perfChart" style="width: 100%; height: 200px;"></div>
+				<div id="perfChart" style="width: 100%; height: 225px;"></div>
 				<div id="bandLegend" style="width: 100%; height: 50px;"></div>
-				<div id="bandChart" style="width: 100%; height: 200px;"></div>
+				<div id="bandChart" style="width: 100%; height: 225px;"></div>
 				<div id="totalTimeLegend" style="width: 100%; height: 50px;"></div>
-				<div id="totalTimeChart" style="width: 100%; height: 200px;"></div>
+				<div id="totalTimeChart" style="width: 100%; height: 225px;"></div>
 				<script type="dojo/connect" event="resize" args="size">
 					// resize the charts if our outer size changes
 					if(this._resizeTimer){
@@ -379,9 +463,9 @@ Modified Nov 2008, Alex Russell
 					if(perfChart && perfChart.resize){
 						// keep the height but change the width
 						this._resizeTimer = setTimeout(function(){
-							perfChart.resize(size.w-10, 200);
-							bandChart.resize(size.w-10, 200);
-							totalTimeChart.resize(size.w-10, 200);
+							perfChart.resize(size.w-10, 225);
+							bandChart.resize(size.w-10, 225);
+							totalTimeChart.resize(size.w-10, 225);
 						}, 50);
 					}
 				</script>
