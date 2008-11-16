@@ -121,11 +121,13 @@ Modified Nov 2008, Alex Russell
 				var dataItems;
 				if(this._results.length > 2){
 					// calculate the current running averages
-					this._results.sort(function(a, b){
-						a.total - b.total;
-					});
+
+					// order by lowest to highest execution time
+					this._results.sort(function(a, b){ a.total - b.total; });
+					// omit the lowest and highest (outliers)
 					dataItems = this._results.slice(1, -1);
 					for(var x in this.averages){
+						// updated the averages
 						this.averages[x] = mean(dataItems, x);
 					};
 				}
@@ -167,8 +169,15 @@ Modified Nov 2008, Alex Russell
 					list.push(def);
 				}, this);
 			},
+
+			//	name: String
+			//		the short name of the test
 			name: "",
+			//	file: String
+			//		the name of the file to load to execute the test
 			file: "",
+			//	desc: String
+			//		sentence length description of the test
 			desc: "",
 
 			// test averages
@@ -325,7 +334,7 @@ Modified Nov 2008, Alex Russell
 				setTheme(DarkHorse).
 				addAxis("x", xAxisConfig).
 				addAxis("y", yAxisConfig).
-					addPlot("default", { 
+				addPlot("default", { 
 					type: "Bars", 
 					minBarSize: 3,
 					maxBarSize: 3,
@@ -343,7 +352,7 @@ Modified Nov 2008, Alex Russell
 				setTheme(DarkHorse).
 				addAxis("x", xAxisConfig).
 				addAxis("y", yAxisConfig).
-					addPlot("default", { 
+				addPlot("default", { 
 					type: "Bars", 
 					minBarSize: 3,
 					maxBarSize: 3,
