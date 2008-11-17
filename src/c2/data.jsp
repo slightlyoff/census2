@@ -100,7 +100,7 @@
 		item.put("race", _race[ rand.nextInt( _race.length ) ]);
 		item.put("sex", _sex[ rand.nextInt( _sex.length ) ]);
 		if(age < 18){ // sanity checks
-			item.put("classOfWorker", _classOfWorker[ 0 ]);
+			item.put("class", _classOfWorker[ 0 ]);
 			item.put("maritalStatus", _maritalStatus[ 0 ]);
 		}
 		if(x>=start){
