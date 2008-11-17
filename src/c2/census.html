@@ -471,22 +471,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				<table class="censusTable" cellspacing="0">
 					<tbody>
 						<tr dojoType="dojox.widget.Iterator" jsId="tests" id="tests">
-							<!--
-							<script type="dojo/method" args="data">
-								this.data = data;
-								this.disabled = this.data.disabled||false;
-							</script>
-							-->
 							<script type="dojo/connect" event="postCreate">
 								var cb = this.checkbox;
 								dojo.connect(this.domNode, "onclick", function(e){
-									console.debug(e.target, cb.domNode);
 									if(!dojo.isDescendant(e.target, cb.domNode)){
 										cb._onClick(e);
 									}
 								});
 
-								// dojo.toggleClass(this.domNode, "disabled", this.disabled);
 								if(this.disabled){
 									// ghost disabled items
 									dojo.style(this.domNode, "opacity", 0.5);
