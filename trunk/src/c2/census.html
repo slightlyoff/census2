@@ -59,6 +59,7 @@ Modified Nov 2008, Alex Russell
 		//		* finish the "guided" pane
 		//		* provide a UI to tweak the # of times a given test is run
 		//		* theme buttons and drop-downs
+		//		* enabled/disabled state on test groups and UI to show that in the test list
 
 		// color groups:
 		colorGroups = [
@@ -118,19 +119,20 @@ Modified Nov 2008, Alex Russell
 				if(this._currentlyRunning){
 					this._currentlyRunning.callback(properties);
 				}
-				var dataItems;
+				// calculate the current running averages
+				var dataItems = this._results.slice(0);
 				if(this._results.length > 2){
-					// calculate the current running averages
+					// if we have enough items to discard the outliners, do it
 
 					// order by lowest to highest execution time
 					this._results.sort(function(a, b){ a.total - b.total; });
-					// omit the lowest and highest (outliers)
+					// omit the outliers
 					dataItems = this._results.slice(1, -1);
-					for(var x in this.averages){
-						// updated the averages
-						this.averages[x] = mean(dataItems, x);
-					};
 				}
+				for(var x in this.averages){
+					// updated the averages
+					this.averages[x] = mean(dataItems, x);
+				};
 			},
 
 			testCount: 5, // how many times to run a given test
@@ -165,7 +167,9 @@ Modified Nov 2008, Alex Russell
 						this._currentlyRunning = def;
 						this._doTestRun();
 					});
-					last.addBoth(runner);
+					last.addBoth(function(){
+						setTimeout(runner, 500); // let it breathe
+					});
 					list.push(def);
 				}, this);
 			},
@@ -433,6 +437,14 @@ Modified Nov 2008, Alex Russell
 				<table class="censusTable" cellspacing="0">
 					<tbody>
 						<tr dojoType="dojox.widget.Iterator" jsId="tests" id="tests">
+							<script type="dojo/connect" event="postCreate">
+								var cb = this.checkbox;
+								dojo.connect(this.domNode, "onclick", function(e){
+									if(!dojo.isDescendant(e.target, cb.domNode)){
+										cb._onClick(e);
+									}
+								});
+							</script>
 							<td class="checkbox" style="width: 20px;">
 								<div dojoType="dijit.form.CheckBox"
 									dojoAttachPoint="checkbox">${file}</div>
@@ -475,7 +487,7 @@ Modified Nov 2008, Alex Russell
 							perfChart.resize(size.w-10, 225);
 							bandChart.resize(size.w-10, 225);
 							totalTimeChart.resize(size.w-10, 225);
-						}, 50);
+						}, 100);
 					}
 				</script>
 			</div>
