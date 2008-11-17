@@ -36,6 +36,7 @@ dependencies = {
 			],
 			dependencies: [
 				"dojox.grid.DataGrid",
+				"dojo.data.ItemFileReadStore",
 			]
 		},
 		{
