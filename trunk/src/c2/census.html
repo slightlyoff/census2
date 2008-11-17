@@ -2,6 +2,8 @@
 Copyright (C) 2007 James Ward
 http://www.jamesward.org
 
+Updated, Alex Russell, 2008
+http://alex.dojotoolkit.org
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,8 +18,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-
-Modified Nov 2008, Alex Russell
 -->
 <html>
 <head>
@@ -303,7 +303,7 @@ Modified Nov 2008, Alex Russell
 				labels: dojo.map(testList, "return { value: index+1, text: item.name };")
 			};
 
-			var chartHeight = 225;
+			var chartHeight = 250;
 
 			// create and configure the initial charts
 			perfChart = new dojox.charting.Chart2D("perfChart").
@@ -514,11 +514,11 @@ Modified Nov 2008, Alex Russell
 				style="overflow-x: hidden; overflow-y: auto;">
 
 				<div id="perfLegend" style="width: 100%; height: 50px;"></div>
-				<div id="perfChart" style="width: 100%; height: 225px;"></div>
+				<div id="perfChart" style="width: 100%; height: 250px;"></div>
 				<div id="bandLegend" style="width: 100%; height: 50px;"></div>
-				<div id="bandChart" style="width: 100%; height: 225px;"></div>
+				<div id="bandChart" style="width: 100%; height: 250px;"></div>
 				<div id="totalTimeLegend" style="width: 100%; height: 50px;"></div>
-				<div id="totalTimeChart" style="width: 100%; height: 225px;"></div>
+				<div id="totalTimeChart" style="width: 100%; height: 250px;"></div>
 				<script type="dojo/connect" event="resize" args="size">
 					// resize the charts if our outer size changes
 					if(this._resizeTimer){
@@ -527,9 +527,9 @@ Modified Nov 2008, Alex Russell
 					if(perfChart && perfChart.resize){
 						// keep the height but change the width
 						this._resizeTimer = setTimeout(function(){
-							perfChart.resize(size.w-10, 225);
-							bandChart.resize(size.w-10, 225);
-							totalTimeChart.resize(size.w-10, 225);
+							perfChart.resize(size.w-10, 250);
+							bandChart.resize(size.w-10, 250);
+							totalTimeChart.resize(size.w-10, 250);
 						}, 100);
 					}
 				</script>

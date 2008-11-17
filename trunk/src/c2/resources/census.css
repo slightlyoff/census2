@@ -85,6 +85,11 @@ a {
 	background: black none;
 }
 
+.census .dijitSplitterV .dijitSplitterThumb {
+	background-image: none;
+}
+
+
 .census .dijitGutterH {
 	background: black none;
 }

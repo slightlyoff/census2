@@ -21,52 +21,31 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 -->
 <html>
 	<head>
+		<!--
 		<link rel="stylesheet" href="resources/main.css" type="text/css">
-		<script type="text/javascript" src="dojo/dojo/dojo.js"></script>
+		-->
+		<link rel="stylesheet" href="dojo/dijit/themes/dijit.css" type="text/css">
+		<link rel="stylesheet" href="dojo/dojox/grid/resources/tundraGrid.css" type="text/css">
+		<script type="text/javascript" src="dojo/dojo/dojo.js" djConfig="parseOnLoad: true"></script>
 		<script type="text/javascript" src="dojo/dojo/cookie.js"></script>
 		<script type="text/javascript" src="resources/timing.js"></script>
 		<script type="text/javascript">
 			dojo.require("dojo.cookie");
-
-			var getXmlDoc = function(url){
-				var ret;
-				dojo.xhrGet({
-					url: url,
-					sync: true,
-					handleAs: "xml",
-					load: function(d){ ret = d; }
-				});
-				return ret;
-			}
-
-			var transformDoc = function(url, xmlDoc){
-				var frag;
-				var xslDoc = getXmlDoc(url);
-				if(dojo.isIE){
-					frag = document.createDocumentFragment();
-					frag.innerHTML = xmlDoc.tranformNode(xslDoc);
-				}else{
-					var p = new XSLTProcessor();
-					p.importStylesheet(xslDoc);
-					frag = p.transformToFragment(xmlDoc, document);
-				}
-				return frag;
-			}
-
+			dojo.require("dijit.dijit");
+			dojo.require("dojox.grid.DataGrid");
+			dojo.require("dojo.data.ItemFileReadStore");
 			dojo.addOnLoad(function(){
-
 				timing.tic("transferTime");
 				dojo.xhrGet({
-					handleAs: "xml",
+					handleAs: "text",
 					url: "data.jsp",
 					content: {
-						output: "xml",
+						output: "json",
 						count: 5000,
 						start: 0
 					},
-					load: function(doc, ioArgs){
+					load: function(data, ioArgs){
 						try{
-						var data = ioArgs.xhr.responseText;
 						var tt = timing.toc("transferTime");
 
 						var st = parseInt(dojo.cookie("serverExecTime"));
@@ -77,22 +56,47 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 						timing.size("bandwidth", data);
 
 						timing.tic("parseTime");
-						var frag = transformDoc("table.xsl", doc);
+						var jsonData = dojo.fromJson(data);
+						// console.log(jsonData);
+						var dObj = {
+							identifier: "id",
+							label: "age",
+							items: jsonData
+						};
+						ifrs._jsonData = dObj;
+						ifrs._forceLoad();
 						timing.toc("parseTime");
 
 						timing.tic("renderTime");
-						dojo.byId("grid").appendChild(frag.firstChild);
+						dGrid.setStore(ifrs, { age: '*' });
 						timing.toc("renderTime");
 
 						timing.report();
-						}catch(e){ console.debug(e); }
+						}catch(e){ console.error(e); }
 					}
 				});
 			});
 		</script>
 	</head>
-	<body>
+	<body class="tundra">
+		<div dojoType="dojo.data.ItemFileReadStore" jsId="ifrs"></div>
+		<table dojoType="dojox.grid.DataGrid" jsId="dGrid"
+			width="800" height="600">
+			<thead>
+				<tr>
+					<th>id</th>
+					<th>age</th>
+					<th>class</th>
+					<th>education</th>
+					<th>maritalStatus</th>
+					<th>race</th>
+					<th>sex</th>
+				</tr>
+			</thead>
+		</table>
+		<!--
 		<div id="grid">
 		</div>
+		-->
 	</body>
 </html>
