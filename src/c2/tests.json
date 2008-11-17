@@ -20,6 +20,7 @@
 		"file": "ajax_json.html"
 	},
 	{
+		"disabled": true,
 		"name": "Ajax: SOAP",
 		"desc": "SOAP to HTML table",
 		"file": "ajax_soap.html"
@@ -35,31 +36,37 @@
 		"file": "dojo_QueryReadStore.html"
 	},
 	{
+		"disabled": true,
 		"name": "Flex: SOAP AS",
 		"desc": "SOAP to ActionScript objects",
 		"file": "flex_soap_as.html"
 	},
 	{
+		"disabled": true,
 		"name": "Flex: SOAP E4X",
 		"desc": "SOAP to E4X objects",
 		"file": "flex_soap_e4x.html"
 	},
 	{
+		"disabled": true,
 		"name": "Flex: XML AS",
 		"desc": "XML to ActionScript objects",
 		"file": "flex_xml_as.html"
 	},
 	{
+		"disabled": true,
 		"name": "Flex: XML E4X",
 		"desc": "XML to E4X objects",
 		"file": "flex_xml_e4x.html"
 	},
 	{
+		"disabled": true,
 		"name": "Flex: AMF3",
 		"desc": "RemoteObject via AMF3",
 		"file": "flex_amf3.html"
 	},
 	{
+		"disabled": true,
 		"name": "Flex: Paged",
 		"desc": "Flex DataService with paging",
 		"file": "flex_paged.html"

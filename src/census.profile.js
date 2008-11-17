@@ -24,6 +24,12 @@ dependencies = {
 		},
 		*/
 		{
+			name: "../dojo/cookie.js",
+			dependencies: [
+				"dojo.cookie"
+			]
+		},
+		{
 			name: "../dojox/grid/DataGrid.js",
 			layerDependencies: [
 				"../dijit/dijit.js",
@@ -60,6 +66,8 @@ dependencies = {
 				"dojox.widget.Iterator",
 				"dijit.layout.TabContainer",
 				"dijit.layout.ContentPane",
+				"dojox.lang.functional.sequence",
+				"dojox.charting.Theme",
 			]
 		},
 	],
