@@ -25,17 +25,46 @@ Updated, Alex Russell, 2008
 		<script type="text/javascript" src="resources/timing.js"></script>
 		<script type="text/javascript">
 			dojo.require("dojo.cookie");
+
+			var getXmlDoc = function(url){
+				var ret;
+				dojo.xhrGet({
+					url: url,
+					sync: true,
+					handleAs: "xml",
+					load: function(d){ ret = d; }
+				});
+				return ret;
+			}
+
+			var transformDoc = function(url, xmlDoc){
+				var frag;
+				var xslDoc = getXmlDoc(url);
+				if(dojo.isIE){
+					frag = document.createDocumentFragment();
+					frag.innerHTML = xmlDoc.tranformNode(xslDoc);
+				}else{
+					var p = new XSLTProcessor();
+					p.importStylesheet(xslDoc);
+					frag = p.transformToFragment(xmlDoc, document);
+				}
+				return frag;
+			}
+
 			dojo.addOnLoad(function(){
+
 				timing.tic("transferTime");
 				dojo.xhrGet({
-					handleAs: "text",
+					handleAs: "xml",
 					url: "data.jsp",
 					content: {
 						output: "xml",
-						count: 5,
+						count: 5000,
 						start: 0
 					},
 					load: function(doc, ioArgs){
+						try{
+						var data = ioArgs.xhr.responseText;
 						var tt = timing.toc("transferTime");
 
 						var st = parseInt(dojo.cookie("serverExecTime"));
@@ -46,31 +75,15 @@ Updated, Alex Russell, 2008
 						timing.size("bandwidth", data);
 
 						timing.tic("parseTime");
+						var frag = transformDoc("table.xsl", doc);
 						timing.toc("parseTime");
 
 						timing.tic("renderTime");
-						var html = [
-							'<table id="dataTable"><tbody>'
-						];
-						dojo.forEach(doc.firstChild.childNodes, function(i){
-							console.debug(i);
-							/*
-							html.push('<tr>');
-							html.push('<td>', i.id, '</td>');
-							html.push('<td>', i.age, '</td>');
-							html.push('<td>', i["class"], '</td>');
-							html.push('<td>', i.education, '/td>');
-							html.push('<td>', i.maritalStatus, '</td>');
-							html.push('<td>', i.race, '</td>');
-							html.push('<td>', i.sex, '</td>');
-							html.push('</tr>');
-							*/
-						});
-						html.push("</tbody></table>");
-						dojo.byId("grid").innerHTML = html.join("");
+						dojo.byId("grid").appendChild(frag.firstChild);
 						timing.toc("renderTime");
 
 						timing.report();
+						}catch(e){ console.debug(e); }
 					}
 				});
 			});

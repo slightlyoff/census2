@@ -5,23 +5,21 @@
 
 	<xsl:output method="html" indent="yes" />
 	
-	<xsl:template match="list">
+	<xsl:template match="/">
 		<table id="dataTable">
 			<tbody>
-				<xsl:apply-templates select="item" />
+				<xsl:for-each select="list/item">
+					<tr>
+						<td><xsl:value-of select="itemId" /></td>
+						<td><xsl:value-of select="age" /></td>
+						<td><xsl:value-of select="classOfWorker" /></td>
+						<td><xsl:value-of select="education" /></td>
+						<td><xsl:value-of select="maritalStatus" /></td>
+						<td><xsl:value-of select="race" /></td>
+						<td><xsl:value-of select="sex" /></td>
+					</tr>
+				</xsl:for-each>
 			</tbody>
 		</table>
-	</xsl:template>
-
-	<xsl:template match="item">
-		<tr>
-			<td><xsl:value-of select="itemId" /></td>
-			<td><xsl:value-of select="age" /></td>
-			<td><xsl:value-of select="classOfWorker" /></td>
-			<td><xsl:value-of select="education" /></td>
-			<td><xsl:value-of select="maritalStatus" /></td>
-			<td><xsl:value-of select="race" /></td>
-			<td><xsl:value-of select="sex" /></td>
-		</tr>
 	</xsl:template>
 </xsl:stylesheet>
