@@ -44,9 +44,19 @@
 			this.setTime(this._totalTimeName, (now()-this._initStart));
 			var p = window.parent;
 			if(p == window){
-				console.debug("can't report to parent window!");
+				console.debug("********************************************");
+				console.debug("* can't report timings to the parent window, \n* test is being run stand-alone");
 				// FIXME:
 				//		log out timings and such to the console
+				console.debug("*\n*\n*	TIMINGS:");
+				for(var x in this._timings){
+					console.debug("*		", x, ":", this._timings[x], "ms");
+				}
+				console.debug("*\n*	SIZES:");
+				for(var x in this._sizes){
+					console.debug("*		", x, ":", this._sizes[x], "bytes");
+				}
+				console.debug("********************************************");
 				return;
 			}
 			
