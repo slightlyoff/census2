@@ -51,6 +51,7 @@ Modified Nov 2008, Alex Russell
 		dojo.require("dojox.charting.widget.Legend");
 		dojo.require("dojox.lang.functional.sequence");
 		dojo.require("dojox.charting.Theme");
+		// dojo.require("dijit.ProgressBar");
 
 		// TODO:
 		//		* revise census layer with added dependencies
@@ -120,7 +121,6 @@ Modified Nov 2008, Alex Russell
 			//	disabled: Boolean
 			//		should the test be included in the visual list of tests and/or run?
 			disabled: false,
-
 			//	testCount: Integer
 			//		how many times to run a given test
 			testCount: 5, 
@@ -128,6 +128,9 @@ Modified Nov 2008, Alex Russell
 			//		Time (in ms) to wait before declaring a test failed and
 			//		moving on. Thirty seconds is the default timeout.
 			timeout: 30000,
+			//	rowCount: Integer
+			//		number of rows to fetch or emulate fetching
+			rowCount: 5000,
 
 			// test averages
 			averages: {
@@ -472,6 +475,7 @@ Modified Nov 2008, Alex Russell
 							<script type="dojo/connect" event="postCreate">
 								var cb = this.checkbox;
 								dojo.connect(this.domNode, "onclick", function(e){
+									console.debug(e.target, cb.domNode);
 									if(!dojo.isDescendant(e.target, cb.domNode)){
 										cb._onClick(e);
 									}
@@ -482,7 +486,7 @@ Modified Nov 2008, Alex Russell
 									// ghost disabled items
 									dojo.style(this.domNode, "opacity", 0.5);
 								}
-								this.checkbox.attr("disabled", this.disabled);
+								this.checkbox.attr("disabled", !!this.disabled);
 							</script>
 							<td class="checkbox" style="width: 20px;" noop="${disabled}">
 								<div dojoType="dijit.form.CheckBox"
@@ -553,6 +557,12 @@ Modified Nov 2008, Alex Russell
 			</div>
 
 		</div>
+		<!--
+		<div dojoType="dijit.layout.ContentPane" 
+			region="bottom" class="progress">
+			<div dojoType="dijit.ProgressBar" style="width: 100%;"></div>
+		</div>
+		-->
 
 	</div>
 </body>
