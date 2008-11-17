@@ -100,19 +100,56 @@ Modified Nov 2008, Alex Russell
 		// a quick class to describe test items. Items in the global "testList"
 		// are instances of this class
 		dojo.declare("Test", null, {
-			constructor: function(item){
+			constructor: function(/*Object?*/ item){
 				this.averages = dojo.delegate(Test.prototype.averages);
 				if(item){
 					dojo.mixin(this, item);
 				}
 				this.testInit();
 			},
-			_results: [],
+
+			//	name: String
+			//		the short name of the test
+			name: "",
+			//	file: String
+			//		the name of the file to load to execute the test
+			file: "",
+			//	desc: String
+			//		sentence length description of the test
+			desc: "",
+			//	disabled: Boolean
+			//		should the test be included in the visual list of tests and/or run?
+			disabled: false,
+
+			//	testCount: Integer
+			//		how many times to run a given test
+			testCount: 5, 
+			//	timeout: Integer
+			//		Time (in ms) to wait before declaring a test failed and
+			//		moving on. Thirty seconds is the default timeout.
+			timeout: 30000,
+
+			// test averages
+			averages: {
+				serverExecTime: 0,
+				transferTime: 0,
+				parseTime: 0,
+				renderTime: 0,
+				bandwidth: 0,
+				total: 0
+			},
+
 			testInit: function(){
+				//	summary:
+				//		initialize a test run, clearing out old test data, etc.
 				this._results = [];
 			},
-			_currentlyRunning: null,
-			report: function(properties){
+			report: function(/*Object*/ properties){
+				//	summary:
+				//		report back about the currently executing test with
+				//		timing and size data. The fields in "properties" should
+				//		all be Number valued and the key should correspond to
+				//		those in "averages"
 				this._killFlightTimer();
 				// add our results to the list and re-generate the averages
 				this._results.push(properties);
@@ -130,13 +167,39 @@ Modified Nov 2008, Alex Russell
 					dataItems = this._results.slice(1, -1);
 				}
 				for(var x in this.averages){
-					// updated the averages
+					// update the averages
 					this.averages[x] = mean(dataItems, x);
 				};
 			},
 
-			testCount: 5, // how many times to run a given test
-			timeout: 30000, // thirty seconds is the default timeout for each test run
+			addTests: function(/*Array*/ list){
+				//	summary:
+				//		add Deferred objects representing one test run for each
+				//		of the iterations specified in `this.testCount`. Each
+				//		Deferred is chained to the result callback of the
+				//		previous one in the list.
+				dojo.forEach((new Array(this.testCount)), function(i, idx){
+					// the list will always have at least a head Deferred
+					var last = list[list.length-1];
+					var def = new dojo.Deferred();
+					var runner = dojo.hitch(this, function(){
+						this._killFlightTimer();
+						this._killRunning();
+						this._currentlyRunning = def;
+						this._doTestRun();
+					});
+					last.addBoth(function(){
+						setTimeout(runner, 500); // let it breathe
+					});
+					list.push(def);
+				}, this);
+			},
+
+
+			// private properties and methods
+
+			_results: [],
+			_currentlyRunning: null,
 
 			_inFlightTests: [],
 			_flightTimer: null,
@@ -155,43 +218,6 @@ Modified Nov 2008, Alex Russell
 						this._currentlyRunning.errback(false);
 					}
 				}
-			},
-			addTests: function(list){
-				dojo.forEach((new Array(this.testCount)), function(i, idx){
-					// the list will always have at least a head Deferred
-					var last = list[list.length-1];
-					var def = new dojo.Deferred();
-					var runner = dojo.hitch(this, function(){
-						this._killFlightTimer();
-						this._killRunning();
-						this._currentlyRunning = def;
-						this._doTestRun();
-					});
-					last.addBoth(function(){
-						setTimeout(runner, 500); // let it breathe
-					});
-					list.push(def);
-				}, this);
-			},
-
-			//	name: String
-			//		the short name of the test
-			name: "",
-			//	file: String
-			//		the name of the file to load to execute the test
-			file: "",
-			//	desc: String
-			//		sentence length description of the test
-			desc: "",
-
-			// test averages
-			averages: {
-				serverExecTime: 0,
-				transferTime: 0,
-				parseTime: 0,
-				renderTime: 0,
-				bandwidth: 0,
-				total: 0
 			}
 		});
 
@@ -437,6 +463,12 @@ Modified Nov 2008, Alex Russell
 				<table class="censusTable" cellspacing="0">
 					<tbody>
 						<tr dojoType="dojox.widget.Iterator" jsId="tests" id="tests">
+							<!--
+							<script type="dojo/method" args="data">
+								this.data = data;
+								this.disabled = this.data.disabled||false;
+							</script>
+							-->
 							<script type="dojo/connect" event="postCreate">
 								var cb = this.checkbox;
 								dojo.connect(this.domNode, "onclick", function(e){
@@ -444,8 +476,15 @@ Modified Nov 2008, Alex Russell
 										cb._onClick(e);
 									}
 								});
+
+								// dojo.toggleClass(this.domNode, "disabled", this.disabled);
+								if(this.disabled){
+									// ghost disabled items
+									dojo.style(this.domNode, "opacity", 0.5);
+								}
+								this.checkbox.attr("disabled", this.disabled);
 							</script>
-							<td class="checkbox" style="width: 20px;">
+							<td class="checkbox" style="width: 20px;" noop="${disabled}">
 								<div dojoType="dijit.form.CheckBox"
 									dojoAttachPoint="checkbox">${file}</div>
 							</td>
@@ -492,6 +531,12 @@ Modified Nov 2008, Alex Russell
 				</script>
 			</div>
 
+			<!-- notes on how the tests are structured and run -->
+			<div dojoType="dijit.layout.ContentPane" 
+				title="Methodology" href="methodology.html"
+				style="padding: 0px; margin; 0px; border: none;">
+			</div>
+
 			<!-- test output (if any) -->
 			<div dojoType="dijit.layout.ContentPane" 
 				title="Output" jsId="output"
@@ -507,10 +552,6 @@ Modified Nov 2008, Alex Russell
 				</script>
 			</div>
 
-			<div dojoType="dijit.layout.ContentPane" 
-				title="Methodology" href="methodology.html"
-				style="padding: 0px; margin; 0px; border: none;">
-			</div>
 		</div>
 
 	</div>
