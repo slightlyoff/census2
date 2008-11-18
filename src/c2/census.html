@@ -433,6 +433,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		}
 
 		dojo.addOnLoad(function(){
+			dojo.byId("testContent").src = "blank.html"
 
 			// get the list of tests and populate things accordingly
 			dojo.xhrGet({
@@ -542,8 +543,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			<div dojoType="dijit.layout.ContentPane" 
 				title="Output" jsId="output"
 				style="padding: 0px; margin; 0px; border: none;">
-				<iframe id="testContent" src="blank.html"
-					style="padding: 0px; margin; 0px; border: none;"></iframe>
+				<script type="dojo/connect" event="onShow">
+					dojo.place("testContent", this.domNode, "first");
+					dojo.removeClass("testContent", "absTestContent");
+					dojo.addClass("testContent", "relTestContent");
+				</script>
+				<script type="dojo/connect" event="onHide">
+					dojo.place("testContent", dojo.body(), "last");
+					dojo.removeClass("testContent", "relTestContent");
+					dojo.addClass("testContent", "absTestContent");
+				</script>
 				<script type="dojo/connect" event="resize" args="size">
 					// make sure our iframe resizes to fit whatever size we've been given
 					dojo.style("testContent", {
@@ -562,5 +571,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		-->
 
 	</div>
+	<iframe id="testContent" src="blank.html" class="absTestContent"></iframe>
 </body>
 </html>
