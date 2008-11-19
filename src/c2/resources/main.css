@@ -3,11 +3,13 @@
 	src: url("Vera.ttf") format("truetype");
 }
 
+/*
 @font-face {
 	font-family: "Vera";
 	src: url("VeraBold.ttf") format("truetype");
 	font-weight: bold;
 }
+*/
 
 html, body {
     font-family: "Myriad Web Pro", HelveticaNeue-Light, Vera, Helvetica, Arial, sans-serif;
