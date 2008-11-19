@@ -285,6 +285,23 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			// visual axis configurationsshared between the bandwidth and
 			// timing charts
 
+			var getTimeLabel = function(num){
+				var txt = num+"ms";
+				if(num >= 1000){ txt = (num/1000)+"s"; }
+				if(num >= 60000){
+					// FIXME: minute formatting here!
+				}
+				return txt;
+			};
+
+			var getDataLabel = function(num){
+				var txt = (num/1024)+"KB";
+				if(num >= 1024000){
+					txt = (num/1024000)+"MB";
+				}
+				return txt;
+			};
+
 			var xAxisConfig = {
 				majorLabels: true, 
 				minorLabels: true, 
@@ -313,7 +330,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			// create and configure the initial charts
 			perfChart = new dojox.charting.Chart2D("perfChart").
 				setTheme(DarkHorse).
-				addAxis("x", xAxisConfig).
+				addAxis("x", dojo.delegate(xAxisConfig, { 
+					majorTickStep: 500, // show every 500ms
+					maxLabelSize: 50,
+					labelFunc: getTimeLabel
+				})).
 				addAxis("y", yAxisConfig).
 				addPlot("default", { 
 					type: "StackedBars", 
@@ -370,8 +391,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 			bandChart = new dojox.charting.Chart2D("bandChart").
 				setTheme(DarkHorse).
-				addAxis("x", xAxisConfig).
 				addAxis("y", yAxisConfig).
+				addAxis("x", dojo.delegate(xAxisConfig, { 
+					majorTickStep: 102400, // show every 100K
+					maxLabelSize: 50,
+					labelFunc: getDataLabel
+				})).
 				addPlot("default", { 
 					type: "Bars", 
 					minBarSize: 3,
@@ -388,7 +413,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 			totalTimeChart = new dojox.charting.Chart2D("totalTimeChart").
 				setTheme(DarkHorse).
-				addAxis("x", xAxisConfig).
+				addAxis("x", dojo.delegate(xAxisConfig, { 
+					majorTickStep: 500, // show every 500ms
+					maxLabelSize: 50,
+					labelFunc: getTimeLabel
+				})).
 				addAxis("y", yAxisConfig).
 				addPlot("default", { 
 					type: "Bars", 
