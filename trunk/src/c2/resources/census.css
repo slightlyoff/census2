@@ -31,11 +31,40 @@ a {
 
 }
 
-.census .progress{
+.census .progress {
 	background-color: #1a1a1a;
-	padding: 5px;
+	padding: 1px;
+	overflow: hidden;
 	border: 1px solid #2a2a2a;
 
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+}
+
+.census .dijitProgressBarEmpty {
+	background: none #1a1a1a;
+}
+
+.census .dijitProgressBarFull {
+	border-right: none;	
+}
+
+.census .dijitProgressBarTile {
+	height: 6px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+/*
+	background-color: #111111;
+	background-image: none;
+*/
+}
+
+.census .dijitProgressBarLabel {
+	display: none;
+}
+
+.census .dijitProgressBar {
+	border: 1px solid #1a1a1a;
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
 }
@@ -77,6 +106,10 @@ a {
 .census .dijitTabPaneWrapper {
 	background: transparent none;
 	border: none;
+}
+
+.census .dijitTabSpacer {
+	display: none;
 }
 
 .census .dijitSplitter,
