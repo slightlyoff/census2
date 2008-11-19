@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DOJO_VERSION=1.2.1
+DOJO_VERSION=1.2.2
 FLEX_VERSION=3.1.0.2710
 FLEX_SDK_NAME="flex_sdk_"$FLEX_VERSION"_mpl.zip"
 
@@ -48,13 +48,6 @@ then
 		echo "	...done"
 
 	fi
-
-	echo "	copying in updated Dojo Charting..."
-	rm -rf dojo_src/dojox/charting
-	rm -rf dojo_src/dojox/gfx
-	cp -r dojo_patches/charting dojo_src/dojox/
-	cp -r dojo_patches/gfx dojo_src/dojox/
-	echo "	...done"
 
 	echo "	creating Dojo build against custom layer"
 
