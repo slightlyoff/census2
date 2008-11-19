@@ -51,7 +51,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		dojo.require("dojox.charting.widget.Legend");
 		dojo.require("dojox.lang.functional.sequence");
 		dojo.require("dojox.charting.Theme");
-		// dojo.require("dijit.ProgressBar");
+		dojo.require("dijit.ProgressBar");
 
 		// TODO:
 		//		* revise census layer with added dependencies
@@ -245,6 +245,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				t.testInit();
 				t.addTests(tl);
 			});
+			progress.update({
+				"progress": 0,
+				maximum: tl.length
+			});
+			dojo.forEach(tl, function(t, idx){
+				t.addBoth(function(){
+					progress.update({
+						"progress": idx+1
+					});
+				});
+			});
 			first.callback(true);
 		}
 
@@ -261,6 +272,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 		testList = null;
 
+		perfChart = null;
+		perfLegend = null;
+		bandChart = null,
+		bandLegend = null;
+		totalTimeChart = null;
+		totalTimeLegend = null;
+
 		setTestList = function(list){
 			try{
 			list = dojo.map(list, "return new Test(item);");
@@ -269,20 +287,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			// upgrade the items in the list to hold slots for their data:
 			testList = list.reverse();
 
-			/*
-			// for old browsers
-			dojo.query(".censusTable tr").
-				onmouseenter(function(e){
-					console.debug(this);
-					dojo.addClass(this, "censusTrHover");
-				}).
-				onmouseleave(function(e){
-					console.debug(this);
-					dojo.removeClass(this, "censusTrHover");
-				});
-			*/
-
-			// visual axis configurationsshared between the bandwidth and
+			// visual axis configurations shared between the bandwidth and
 			// timing charts
 
 			var getTimeLabel = function(num){
@@ -328,7 +333,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			var chartHeight = 250;
 
 			// create and configure the initial charts
-			perfChart = new dojox.charting.Chart2D("perfChart").
+			perfChart = new dojox.charting.Chart2D("perfChartNode").
 				setTheme(DarkHorse).
 				addAxis("x", dojo.delegate(xAxisConfig, { 
 					majorTickStep: 500, // show every 500ms
@@ -345,20 +350,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				addSeries(
 					"Server Exec Time", 
 					dojo.map(testList, "return item.averages.serverExecTime;"),
-					{
-						stroke: { width: 0 } // , 
-						/*
-						fill: {
-							type: "linear",
-							x1: 0, y1: 0,
-							x2: 0, y2: chartHeight,
-							colors: [
-								{ color: "#e28741", offset: 0 },
-								{ color: "#c6691c", offset: 1 }
-							]
-						}
-						*/
-					}
+					{ stroke: { width: 0 } }
 				).
 				addSeries(
 					"Transfer Time", 
@@ -384,12 +376,22 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			dojo.forEach(group.children, function(rect){
 				var bbox = rect.getBoundingBox();
 				// set your gradient using absolute coordinates
-				rect.setFill(yourFancyFill);
+				rect.setFill({
+					type: "linear",
+					x1: 0, y1: 0,
+					x2: 0, y2: chartHeight,
+					colors: [
+						{ color: "#e28741", offset: 0 },
+						{ color: "#c6691c", offset: 1 }
+					]
+				});
 			});
 			*/
-			perfLegend = new dojox.charting.widget.Legend({ chart: perfChart }, "perfLegend");
 
-			bandChart = new dojox.charting.Chart2D("bandChart").
+
+			perfLegend = new dojox.charting.widget.Legend({ chart: perfChart }, "perfLegendNode");
+
+			bandChart = new dojox.charting.Chart2D("bandChartNode").
 				setTheme(DarkHorse).
 				addAxis("y", yAxisConfig).
 				addAxis("x", dojo.delegate(xAxisConfig, { 
@@ -409,9 +411,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				).
 			render();
 
-			bandLegend = new dojox.charting.widget.Legend({ chart: bandChart }, "bandLegend");
 
-			totalTimeChart = new dojox.charting.Chart2D("totalTimeChart").
+			bandLegend = new dojox.charting.widget.Legend({ chart: bandChart }, "bandLegendNode");
+
+			totalTimeChart = new dojox.charting.Chart2D("totalTimeChartNode").
 				setTheme(DarkHorse).
 				addAxis("x", dojo.delegate(xAxisConfig, { 
 					majorTickStep: 500, // show every 500ms
@@ -431,8 +434,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				).
 			render();
 
-			totalTimeLegend = new dojox.charting.widget.Legend({ chart: totalTimeChart }, "totalTimeLegend");
-			}catch(e){ console.debug(e); }
+			totalTimeLegend = new dojox.charting.widget.Legend(
+				{ chart: totalTimeChart }, 
+				"totalTimeLegendNode"
+			);
+
+			}catch(e){ console.error(e); }
 		}
 
 		updateCharts = function(){
@@ -540,12 +547,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			<div dojoType="dijit.layout.ContentPane" title="Charts" 
 				style="overflow-x: hidden; overflow-y: auto;">
 
-				<div id="perfLegend" style="width: 100%; height: 50px;"></div>
-				<div id="perfChart" style="width: 100%; height: 250px;"></div>
-				<div id="bandLegend" style="width: 100%; height: 50px;"></div>
-				<div id="bandChart" style="width: 100%; height: 250px;"></div>
-				<div id="totalTimeLegend" style="width: 100%; height: 50px;"></div>
-				<div id="totalTimeChart" style="width: 100%; height: 250px;"></div>
+				<div id="perfLegendNode" style="width: 100%; height: 50px;"></div>
+				<div id="perfChartNode" style="width: 100%; height: 250px;"></div>
+				<div id="bandLegendNode" style="width: 100%; height: 50px;"></div>
+				<div id="bandChartNode" style="width: 100%; height: 250px;"></div>
+				<div id="totalTimeLegendNode" style="width: 100%; height: 50px;"></div>
+				<div id="totalTimeChartNode" style="width: 100%; height: 250px;"></div>
 				<script type="dojo/connect" event="resize" args="size">
 					// resize the charts if our outer size changes
 					if(this._resizeTimer){
@@ -592,12 +599,22 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			</div>
 
 		</div>
-		<!--
 		<div dojoType="dijit.layout.ContentPane" 
 			region="bottom" class="progress">
-			<div dojoType="dijit.ProgressBar" style="width: 100%;"></div>
+			<div dojoType="dijit.ProgressBar" jsId="progress"
+				style="width: 100%; height: 6px;">
+				<script type="dojo/method">
+					dojo.style(this.domNode, "opacity", 0);
+				</script>
+				<script type="dojo/connect" event="onChange">
+					if(0 == this.progress){
+						dojo.fadeIn({ node: this.domNode, duration: 1000 }).play();
+					}else if(this.progress == this.maximum){
+						dojo.fadeOut({ node: this.domNode, duration: 1000 }).play();
+					}
+				</script>
+			</div>
 		</div>
-		-->
 
 	</div>
 	<iframe id="testContent" src="blank.html" class="absTestContent"></iframe>
