@@ -51,7 +51,9 @@ then
 
 	echo "	copying in updated Dojo Charting..."		
 	rm -rf dojo_src/dojox/charting		
+	rm -rf dojo_src/dojox/lang
 	cp -r dojo_patches/charting dojo_src/dojox/		
+	cp -r dojo_patches/lang dojo_src/dojox/		
 	echo "	...done"		
 
 	echo "	creating Dojo build against custom layer"
