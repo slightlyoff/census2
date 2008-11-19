@@ -407,7 +407,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				}).
 				addSeries("Bandwidth", 
 					dojo.map(testList, "return item.averages.bandwidth;"),
-					{ stroke: { width: 0 } }
+					{ 
+						stroke: { width: 0 },
+						// [ "#44aa77", "#339966", "#246d49" ],
+						fill: "#44aa77"
+					}
 				).
 			render();
 
@@ -430,7 +434,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				}).
 				addSeries("Total Test Time", 
 					dojo.map(testList, "return item.averages.total;"),
-					{ stroke: { width: 0 } }
+					{ 
+						stroke: { width: 0 },
+						fill: "#dd0000" // "#990000"
+					}
 				).
 			render();
 
