@@ -605,6 +605,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				style="width: 100%; height: 6px;">
 				<script type="dojo/method">
 					dojo.style(this.domNode, "opacity", 0);
+					dojo.removeClass(this.domNode, "dijitProgressBarIndeterminate");
 				</script>
 				<script type="dojo/connect" event="onChange">
 					if(0 == this.progress){
@@ -612,6 +613,33 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 					}else if(this.progress == this.maximum){
 						dojo.fadeOut({ node: this.domNode, duration: 1000 }).play();
 					}
+				</script>
+				<script type="dojo/method" event="update" args="attributes">
+					// quick method copy + monkey-patch to add animations
+					if(attributes){
+						dojo.mixin(this, attributes);
+					}
+					if(!this._lastPct){
+						this._lastPct = 0;
+					}
+					var tip = this.internalProgress;
+					var percent = 1;
+					this.progress = Math.min(this.progress, this.maximum);
+					percent = this.progress / this.maximum;
+					dijit.setWaiState(tip, "describedby", this.label.id);
+					dijit.setWaiState(tip, "valuenow", this.progress);
+					dijit.setWaiState(tip, "valuemin", 0);
+					dijit.setWaiState(tip, "valuemax", this.maximum);
+					// tip.style.width = (percent * 100) + "%";
+					dojo.anim(tip, {
+						width: { 
+							start: this._lastPct, 
+							end: (percent * 100), 
+							units: "%"
+						}
+					});
+					this._lastPct = (percent * 100);
+					this.onChange();
 				</script>
 			</div>
 		</div>
