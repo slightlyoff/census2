@@ -55,11 +55,13 @@ dependencies = {
 			dependencies: [
 				"dojox.gfx",
 				"dijit.dijit",
+				"dijit.ProgressBar",
 				"dijit.layout.BorderContainer",
 				// "dojox.grid.DataGrid",
 				"dojox.charting.widget.Chart2D",
 				"dojox.charting.widget.Sparkline",
 				"dojox.charting.widget.Legend",
+				"dojox.charting.action2d.Tooltip",
 				// "dojox.data.XmlStore",
 				// "dojox.data.QueryReadStore",
 				"dijit.form.CheckBox",
@@ -69,6 +71,8 @@ dependencies = {
 				"dijit.layout.ContentPane",
 				"dojox.lang.functional.sequence",
 				"dojox.charting.Theme",
+				"dojox.dtl",
+				"dojox.dtl.Context",
 			]
 		},
 	],

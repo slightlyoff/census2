@@ -49,9 +49,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		dojo.require("dojox.widget.Iterator");
 		dojo.require("dojox.charting.Chart2D");
 		dojo.require("dojox.charting.widget.Legend");
+		dojo.require("dojox.charting.action2d.Tooltip");
 		dojo.require("dojox.lang.functional.sequence");
 		dojo.require("dojox.charting.Theme");
 		dojo.require("dijit.ProgressBar");
+		dojo.require("dojox.dtl");
+		dojo.require("dojox.dtl.Context");
 
 		// TODO:
 		//		* revise census layer with added dependencies
@@ -291,6 +294,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			// timing charts
 
 			var getTimeLabel = function(num){
+				num = parseFloat(num).toFixed(2);
 				var txt = num+"ms";
 				if(num >= 1000){ txt = (num/1000)+"s"; }
 				if(num >= 60000){
@@ -300,9 +304,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			};
 
 			var getDataLabel = function(num){
-				var txt = (num/1024)+"KB";
+				num = parseFloat(num).toFixed(2);
+				var txt = (num/1024).toFixed(2)+"KB";
 				if(num >= 1024000){
-					txt = (num/1024000)+"MB";
+					txt = (num/1024000).toFixed(2)+"MB";
 				}
 				return txt;
 			};
@@ -369,6 +374,23 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				).
 			render();
 
+			new dojox.charting.action2d.Tooltip(perfChart, "default", {
+				text: function(o){ 
+					var item = testList[o.index];
+					var a = item.averages;
+					var ctx = new dojox.dtl.Context({
+						items: [
+							{ name: "Server Exec Time", time: getTimeLabel(a.serverExecTime) },
+							{ name: "Transfer Time", time: getTimeLabel(a.transferTime) },
+							{ name: "Parse Time", time: getTimeLabel(a.parseTime) },
+							{ name: "Render Time", time: getTimeLabel(a.renderTime) }
+						]
+					});
+					var tmpl = new dojox.dtl.Template("<table>{% for k in items %}<tr><td>{{ k.name }} :</td><td>{{ k.time }}</td></tr>{% endfor %}</table>");
+					return tmpl.render(ctx);
+				}
+			});
+
 			/*
 			// hack for gradients
 			var run = chart.runs[name];
@@ -415,6 +437,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				).
 			render();
 
+			new dojox.charting.action2d.Tooltip(bandChart, "default", {
+				text: function(o){ 
+					var item = testList[o.index];
+					return "Bandwidth: "+getDataLabel(item.averages.bandwidth);
+				}
+			});
 
 			bandLegend = new dojox.charting.widget.Legend({ chart: bandChart }, "bandLegendNode");
 
@@ -440,6 +468,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 					}
 				).
 			render();
+
+			new dojox.charting.action2d.Tooltip(totalTimeChart, "default", {
+				text: function(o){ 
+					var item = testList[o.index];
+					return "Total Test Time: " + getTimeLabel(item.averages.total);
+				}
+			});
 
 			totalTimeLegend = new dojox.charting.widget.Legend(
 				{ chart: totalTimeChart }, 
