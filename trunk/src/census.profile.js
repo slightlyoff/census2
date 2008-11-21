@@ -72,6 +72,7 @@ dependencies = {
 				"dojox.lang.functional.sequence",
 				"dojox.charting.Theme",
 				"dojox.dtl",
+				"dojox.dtl.tag.logic",
 				"dojox.dtl.Context",
 			]
 		},
