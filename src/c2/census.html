@@ -332,7 +332,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				labels: dojo.map(testList, "return { value: index+1, text: item.name };")
 			};
 
-			var chartHeight = 250;
 
 			// create and configure the initial charts
 			perfChart = new dojox.charting.Chart2D("perfChartNode").
@@ -389,6 +388,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			});
 
 			/*
+			var chartHeight = 300;
 			// hack for gradients
 			var run = chart.runs[name];
 			var group = run.group;
@@ -601,11 +601,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				</script>
 
 				<div id="perfLegendNode" style="width: 100%; height: 50px;"></div>
-				<div id="perfChartNode" style="width: 100%; height: 250px;"></div>
+				<div id="perfChartNode" style="width: 100%; height: 300px;"></div>
 				<div id="bandLegendNode" style="width: 100%; height: 50px;"></div>
-				<div id="bandChartNode" style="width: 100%; height: 250px;"></div>
+				<div id="bandChartNode" style="width: 100%; height: 300px;"></div>
 				<div id="totalTimeLegendNode" style="width: 100%; height: 50px;"></div>
-				<div id="totalTimeChartNode" style="width: 100%; height: 250px;"></div>
+				<div id="totalTimeChartNode" style="width: 100%; height: 300px;"></div>
 				<script type="dojo/connect" event="resize" args="size">
 					// resize the charts if our outer size changes
 					if(this._resizeTimer){
@@ -614,9 +614,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 					if(perfChart && perfChart.resize){
 						// keep the height but change the width
 						this._resizeTimer = setTimeout(function(){
-							perfChart.resize(size.w-10, 250);
-							bandChart.resize(size.w-10, 250);
-							totalTimeChart.resize(size.w-10, 250);
+							perfChart.resize(size.w-10, 300);
+							bandChart.resize(size.w-10, 300);
+							totalTimeChart.resize(size.w-10, 300);
 						}, 100);
 					}
 				</script>

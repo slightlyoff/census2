@@ -53,10 +53,9 @@ a {
 	height: 6px;
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
-/*
-	background-color: #111111;
-	background-image: none;
-*/
+	background: -webkit-gradient(linear, 0% 30%, 0% 100%, from(#d5d5d5), to(#464646));
+	-webkit-background-origin: border;
+	-webkit-background-clip: border;
 }
 
 .census .dijitProgressBarLabel {
@@ -202,15 +201,29 @@ a {
 
 .census .dijitTooltipContainer {
 	border: 1px solid #2a2a2a;
-	-moz-border-radius: 3px;
-	-webkit-border-radius: 3px;
+	/* border: 1px solid black; */
+	/* border: 1px solid #a9a9a9; */
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
 	background: #363636;
 	color: #a9a9a9;
 	font-size: normal;
+	/* background: -webkit-gradient(linear, left top, left bottom, from(#363636), to(#151515)); */
+	background: -webkit-gradient(linear, 0% 20%, left bottom, from(#2c2c2c), to(#151515));
+	-webkit-background-origin: border;
+	-webkit-background-clip: border;
 }
 
 .census .dijitTooltipContainer td {
 	padding: 3px 3px 1px 3px;
+}
+
+.census .dijitTooltipLeft {
+	padding-right: 3px;
+}
+
+.census .dijitTooltipRight {
+	padding-left: 3px;
 }
 
 .relTestContent {
