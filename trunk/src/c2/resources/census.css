@@ -209,6 +209,10 @@ a {
 	font-size: normal;
 }
 
+.census .dijitTooltipContainer td {
+	padding: 3px 3px 1px 3px;
+}
+
 .relTestContent {
 	padding: 0px;
 	margin; 0px;

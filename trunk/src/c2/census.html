@@ -55,6 +55,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		dojo.require("dijit.ProgressBar");
 		dojo.require("dojox.dtl");
 		dojo.require("dojox.dtl.Context");
+		dojo.require("dojox.dtl.filter.misc");
+		dojo.require("dojox.dtl.filter.logic");
 
 		// TODO:
 		//		* finish the "guided" pane
@@ -183,7 +185,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				//		of the iterations specified in `this.testCount`. Each
 				//		Deferred is chained to the result callback of the
 				//		previous one in the list.
-				dojo.forEach((new Array(this.testCount)), function(i, idx){
+				dojo.forEach((new Array(testCount||this.testCount)), function(i, idx){
 					// the list will always have at least a head Deferred
 					var last = list[list.length-1];
 					var def = new dojo.Deferred();
@@ -269,10 +271,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				console.debug("no matching test registered for:", file);
 			}
 			dojo.forEach(tl, function(t){ t.report(properties); });
-			updateCharts();
+			chartPane.updateCharts();
 			dataPane.updateGrid();
 		}
 
+		testCount = 1;
 		testList = null;
 
 		perfChart = null;
@@ -294,7 +297,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			// timing charts
 
 			var getTimeLabel = function(num){
-				num = parseFloat(num).toFixed(2);
+				num = parseInt(num);
 				var txt = num+"ms";
 				if(num >= 1000){ txt = (num/1000)+"s"; }
 				if(num >= 60000){
@@ -303,14 +306,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				return txt;
 			};
 
-			var getDataLabel = function(num){
-				num = parseFloat(num).toFixed(2);
-				var txt = (num/1024).toFixed(2)+"KB";
-				if(num >= 1024000){
-					txt = (num/1024000).toFixed(2)+"MB";
-				}
-				return txt;
-			};
+			var getDataLabel = dojox.dtl.filter.misc.filesizeformat;
 
 			var xAxisConfig = {
 				majorLabels: true, 
@@ -386,7 +382,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 							{ name: "Render Time", time: getTimeLabel(a.renderTime) }
 						]
 					});
-					var tmpl = new dojox.dtl.Template("<table>{% for k in items %}<tr><td>{{ k.name }} :</td><td>{{ k.time }}</td></tr>{% endfor %}</table>");
+					var tmpl = new dojox.dtl.Template("<table>{% for k in items %}<tr><td style='text-align: right;'>{{ k.name }} :</td><td>{{ k.time }}</td></tr>{% endfor %}</table>");
 					return tmpl.render(ctx);
 				}
 			});
@@ -586,8 +582,22 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			region="center" class="mainPane">
 
 			<!-- charts -->
-			<div dojoType="dijit.layout.ContentPane" title="Charts" 
+			<div dojoType="dijit.layout.ContentPane"
+				title="Charts" 
+				jsId="chartPane"
 				style="overflow-x: hidden; overflow-y: auto;">
+				<script type="dojo/connect" event="onShow">
+					// console.debug("chartPane.onShow");
+					this._showing = true;
+					this.updateCharts();
+				</script>
+				<script type="dojo/connect" event="onHide">
+					this._showing = false;
+				</script>
+				<script type="dojo/method" event="updateCharts">
+					if(!this._showing){ return; }
+					if(perfChart){ updateCharts(); }
+				</script>
 
 				<div id="perfLegendNode" style="width: 100%; height: 50px;"></div>
 				<div id="perfChartNode" style="width: 100%; height: 250px;"></div>
@@ -623,30 +633,30 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 								<td>Transfer (ms)</td>
 								<td>Parse (ms)</td>
 								<td>Render (ms)</td>
-								<td>Bandwidth (bytes)</td>
+								<td>Bandwidth</td>
 								<td>Total Time (ms)</td>
 							</tr>
 						</thead>
 						<tfoot>
 							<tr>
 								<td>Averages:</td>
-								<td>{{ item.averages.serverExecTime }}</td>
-								<td>{{ item.averages.transferTime }}</td>
-								<td>{{ item.averages.parseTime }}</td>
-								<td>{{ item.averages.renderTime }}</td>
-								<td>{{ item.averages.bandwidth }}</td>
-								<td>{{ item.averages.total }}</td>
+								<td>{{ item.averages.serverExecTime|default:"0" }}</td>
+								<td>{{ item.averages.transferTime|default:"0" }}</td>
+								<td>{{ item.averages.parseTime|default:"0" }}</td>
+								<td>{{ item.averages.renderTime|default:"0" }}</td>
+								<td>{{ item.averages.bandwidth|default:"0"|filesizeformat }}</td>
+								<td>{{ item.averages.total|default:"0" }}</td>
 							</tr>
 						</tfoot>
 						<tbody>
 							{% for r in item._results %}
 							<tr>
-								<td colspan="2">{{ r.serverExecTime }}</td>
-								<td>{{ r.transferTime }}</td>
-								<td>{{ r.parseTime }}</td>
-								<td>{{ r.renderTime }}</td>
-								<td>{{ r.bandwidth }}</td>
-								<td>{{ r.total }}</td>
+								<td colspan="2">{{ r.serverExecTime|default:"0" }}</td>
+								<td>{{ r.transferTime|default:"0" }}</td>
+								<td>{{ r.parseTime|default:"0" }}</td>
+								<td>{{ r.renderTime|default:"0" }}</td>
+								<td>{{ r.bandwidth|default:"0"|filesizeformat }}</td>
+								<td>{{ r.total|default:"0" }}</td>
 							</tr>
 							{% endfor %}
 						</tbody>
@@ -660,9 +670,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				jsId="dataPane"
 				style="padding: 10px; margin; 0px; border: none;">
 				<script type="dojo/connect" event="onShow">
+					this._showing = true;
 					this.updateGrid();
 				</script>
+				<script type="dojo/connect" event="onHide">
+					this._showing = false;
+				</script>
 				<script type="dojo/method" event="updateGrid">
+					if(!this._showing){ return; }
 					var ctx = new dojox.dtl.Context({ list: testList });
 					var tmpl = new dojox.dtl.Template(dojo.byId("dataTemplate").value);
 					this.attr("content", tmpl.render(ctx));
