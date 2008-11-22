@@ -231,3 +231,34 @@ a {
 	min-width: 100px;
 	min-height: 100px;
 }
+
+table.rawData {
+	margin: 0px;
+	padding: 0px;
+	border-collapse: collapse;
+	margin-top: 15px;
+}
+
+table.rawData td {
+	padding-top: 10px;
+	padding-right: 10px;
+	padding-bottom: 4px;
+	border-right: 1px solid #2a2a2a;
+}
+
+table.rawData td.odd {
+	background-color: #151515
+}
+
+table.rawData thead td,
+table.rawData tfoot td {
+	background-color: #2a2a2a;
+	padding: 4px;
+	padding-top: 4px;
+}
+
+table.rawData tbody td,
+table.rawData tfoot td {
+	text-align: right;
+	padding-right: 10px;
+}

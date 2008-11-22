@@ -167,15 +167,18 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				if(this._results.length > 2){
 					// if we have enough items to discard the outliners, do it
 
-					// order by lowest to highest execution time
-					this._results.sort(function(a, b){ a.total - b.total; });
 					// omit the outliers
-					dataItems = this._results.slice(1, -1);
+					dataItems = this.sortedResults().slice(1, -1);
 				}
 				for(var x in this.averages){
 					// update the averages
-					this.averages[x] = mean(dataItems, x);
+					this.averages[x] = parseInt(mean(dataItems, x));
 				};
+			},
+
+			sortedResults: function(){
+				// order by lowest to highest execution time
+				return this._results.slice(0).sort(function(a, b){ a.total - b.total; });
 			},
 
 			addTests: function(/*Array*/ list){
@@ -271,6 +274,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			}
 			dojo.forEach(tl, function(t){ t.report(properties); });
 			updateCharts();
+			dataPane.updateGrid();
 		}
 
 		testList = null;
@@ -611,10 +615,68 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				</script>
 			</div>
 
+			<!-- the raw data in tabular format -->
+			<textarea style="display: none;" id="dataTemplate">
+				{% for item in list %}
+					{% if item._results|length %}
+					<h4>{{ item.desc }}</h4>
+					<table class="rawData">
+						<thead>
+							<tr>
+								<td colspan="2">Server Time (ms)</td>
+								<td>Transfer (ms)</td>
+								<td>Parse (ms)</td>
+								<td>Render (ms)</td>
+								<td>Bandwidtd (bytes)</td>
+								<td>Total Time (ms)</td>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td>Averages:</td>
+								<td>{{ item.averages.serverExecTime }}</td>
+								<td>{{ item.averages.transferTime }}</td>
+								<td>{{ item.averages.parseTime }}</td>
+								<td>{{ item.averages.renderTime }}</td>
+								<td>{{ item.averages.bandwidth }}</td>
+								<td>{{ item.averages.total }}</td>
+							</tr>
+						</tfoot>
+						<tbody>
+							{% for r in item._results %}
+							<tr>
+								<td colspan="2">{{ r.serverExecTime }}</td>
+								<td>{{ r.transferTime }}</td>
+								<td>{{ r.parseTime }}</td>
+								<td>{{ r.renderTime }}</td>
+								<td>{{ r.bandwidth }}</td>
+								<td>{{ r.total }}</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+					{%endif%}
+				{% endfor %}
+				<br><br>
+			</textarea>
+			<div dojoType="dijit.layout.ContentPane" 
+				title="Data"
+				jsId="dataPane"
+				style="padding: 10px; margin; 0px; border: none;">
+				<script type="dojo/connect" event="onShow">
+					this.updateGrid();
+				</script>
+				<script type="dojo/method" event="updateGrid">
+					var ctx = new dojox.dtl.Context({ list: testList });
+					var tmpl = new dojox.dtl.Template(dojo.byId("dataTemplate").value);
+					this.attr("content", tmpl.render(ctx));
+				</script>
+			</div>
+
 			<!-- notes on how the tests are structured and run -->
 			<div dojoType="dijit.layout.ContentPane" 
 				title="Methodology" href="methodology.html"
-				style="padding: 0px; margin; 0px; border: none;">
+				style="padding: 10px; margin; 0px; border: none;">
 			</div>
 
 			<!-- test output (if any) -->
