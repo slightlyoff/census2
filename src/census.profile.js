@@ -73,6 +73,8 @@ dependencies = {
 				"dojox.charting.Theme",
 				"dojox.dtl",
 				"dojox.dtl.tag.logic",
+				"dojox.dtl.filter.misc",
+				"dojox.dtl.filter.logic",
 				"dojox.dtl.Context",
 			]
 		},
