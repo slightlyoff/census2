@@ -2,73 +2,86 @@
 	{
 		"name": "Ajax: HTML",
 		"desc": "Server-built HTML table",
-		"file": "ajax_html.html"
+		"file": "ajax_html.html",
+		"longDescUrl": "descriptions/ajax_html.html"
 	},
 	{
 		"name": "Ajax: XML",
 		"desc": "XML to HTML table",
-		"file": "ajax_xml.html"
+		"file": "ajax_xml.html",
+		"longDescUrl": "descriptions/intro.html"
 	},
 	{
 		"name": "Ajax: XML via XSLT",
 		"desc": "XML to HTML table via XSLT",
-		"file": "ajax_xml_xslt.html"
+		"file": "ajax_xml_xslt.html",
+		"longDescUrl": "descriptions/intro.html"
 	},
 	{
 		"name": "Ajax: JSON",
 		"desc": "JSON to HTML table",
-		"file": "ajax_json.html"
+		"file": "ajax_json.html",
+		"longDescUrl": "descriptions/intro.html"
 	},
 	{
 		"disabled": true,
 		"name": "Ajax: SOAP",
 		"desc": "SOAP to HTML table",
-		"file": "ajax_soap.html"
+		"file": "ajax_soap.html",
+		"longDescUrl": "descriptions/intro.html"
 	},
 	{
 		"name": "Dojo: JSON",
 		"desc": "JSON to Dojo Grid",
-		"file": "dojo_json.html"
+		"file": "dojo_json.html",
+		"longDescUrl": "descriptions/intro.html"
 	},
 	{
 		"name": "Dojo: QRS",
 		"desc": "Dojo Grid via QueryReadStore",
-		"file": "dojo_QueryReadStore.html"
+		"file": "dojo_QueryReadStore.html",
+		"longDescUrl": "descriptions/intro.html"
 	},
 	{
 		"disabled": true,
 		"name": "Flex: SOAP AS",
 		"desc": "SOAP to ActionScript objects",
-		"file": "flex_soap_as.html"
+		"file": "flex_soap_as.html",
+		"longDescUrl": "descriptions/intro.html"
 	},
 	{
 		"disabled": true,
 		"name": "Flex: SOAP E4X",
 		"desc": "SOAP to E4X objects",
-		"file": "flex_soap_e4x.html"
+		"file": "flex_soap_e4x.html",
+		"longDescUrl": ""
 	},
 	{
 		"disabled": true,
 		"name": "Flex: XML AS",
 		"desc": "XML to ActionScript objects",
-		"file": "flex_xml_as.html"
+		"file": "flex_xml_as.html",
+		"longDescUrl": ""
 	},
 	{
 		"disabled": true,
 		"name": "Flex: XML E4X",
 		"desc": "XML to E4X objects",
-		"file": "flex_xml_e4x.html"
+		"file": "flex_xml_e4x.html",
+		"longDescUrl": ""
 	},
 	{
 		"disabled": true,
 		"name": "Flex: AMF3",
 		"desc": "RemoteObject via AMF3",
-		"file": "flex_amf3.html"
+		"file": "flex_amf3.html",
+		"longDescUrl": ""
 	},
 	{
 		"disabled": true,
 		"name": "Flex: Paged",
 		"desc": "Flex DataService with paging",
-		"file": "flex_paged.html"
+		"file": "flex_paged.html",
+		"longDescUrl": ""
 	},
 ]

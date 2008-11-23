@@ -60,9 +60,30 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		dojo.require("dojox.dtl.Context");
 		dojo.require("dijit.form.NumberSpinner");
 
+		$ = dojo.query;
+		dojo.extend(dojo.NodeList, {
+			html: function(content, loc){
+				if(!arguments.length){
+					// getter
+					return this.map("return item.innerHTML");
+				}
+				// setter
+				this.empty();
+				this.addContent(content, loc);
+			},
+			xhr: function(url){
+				var t = this;
+				dojo.xhrGet({
+					url: url,
+					load: function(d){
+						t.html(d);
+					}
+				});
+			}
+		});
+
 		// TODO:
 		//		* finish the "guided" pane
-		//		* provide a UI to tweak the # of times a given test is run
 		//		* theme buttons and drop-downs
 
 		// color groups:
@@ -213,9 +234,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			_inFlightTests: [],
 			_flightTimer: null,
 			_doTestRun: function(){
-				dojo.byId("testContent").src = this.file+"?"+dojo.objectToQuery({
+				$("#testContent").attr("src", this.file+"?"+dojo.objectToQuery({
 					rows: (rowCount||this.rowCount)
-				});
+				}));
 			},
 			_killFlightTimer: function(){
 				if(this._inFlightTimer){
@@ -233,8 +254,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		});
 
 		testsByFile = function(f){
-			console.debug(f);
-			return dojo.filter(testList, function(t){ return f == t.file; }),
+			return dojo.filter(testList, function(t){ return f == t.file; });
 		}
 
 		runSelected = function(all){
@@ -249,6 +269,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 					function(i){ return !i.disabled; }
 				).reverse()
 			);
+		}
+
+		runTest = function(f){
+			runTests(testsByFile(f));
 		}
 
 		runTests = function(tests){
@@ -524,7 +548,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		}
 
 		dojo.addOnLoad(function(){
-			dojo.byId("testContent").src = "blank.html"
+			$("#testContent").attr("src", "blank.html");
 
 			// get the list of tests and populate things accordingly
 			dojo.xhrGet({
@@ -549,9 +573,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 			<!-- the "Guide Me" UI -->
 			<div dojoType="dijit.layout.ContentPane" title="Guide Me">
-				<button dojoType="dijit.form.Button" onClick="runSelected(true);"
-					style="width: 100%;">
+				<button dojoType="dijit.form.Button" onClick="runSelected(true);">
 					Run 'Em All
+				</button>
+				<button dojoType="dijit.form.Button" onClick="runSelected(true);">
+					Run Next
 				</button>
 				Rows: <div dojoType="dijit.form.NumberSpinner"
 					constraints="{ max: 20000, min: 0 }"
@@ -577,9 +603,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 						testCount = this.attr("value");
 					</script>
 				</div>
+				<script type="dojo/method" event="setDefaults">
+					$("#guideTitle").html("\"Guide Me\" Mode");
+					$("#guideDetail").xhr("descriptions/intro.html");
+				</script>
 				<script type="dojo/method">
+					this.setDefaults();
+					// fill in the drop down list of tests
 					dojo.connect("setTestList", function(){
 						dojo.forEach(testList.slice(0).reverse(), function(i){
+							if(i.disabled){ return; }
 							var o = dojo.doc.createElement("option");
 							dojo.attr(o, {
 								innerHTML: i.desc,
@@ -588,17 +621,23 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 							dojo.place(o, "testListDropDown", "last");
 						});
 					});
-					dojo.connect(dojo.byId("testListDropDown"), "onchange", function(){
+					// when it changes, run the next test and show different summary data
+					$("#testListDropDown").connect("onchange", function(){
 						// console.dir(this);
+						if(this.value == "default"){
+							this.setDefaults();
+						}
 						var t = testsByFile(this.value)[0];
 						if(!t){ return; }
-						console.debug(t);
-						dojo.byId("guideTitle").innerHTML = t.desc;
+						$("#guideTitle").html(t.desc);
+						$("#guideDetail").xhr(t.longDescUrl);
 					});
 				</script>
 				<select id="testListDropDown">
+					<option value="default">Census - Guide Me</option>
 				</select>
 				<h4 id="guideTitle"></h4>
+				<br>
 				<div id="guideDetail"></div>
 			</div>
 
