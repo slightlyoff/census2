@@ -28,13 +28,18 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		<script type="text/javascript">
 			dojo.require("dojo.cookie");
 			dojo.addOnLoad(function(){
+				var url = new dojo._Url(window.location);
+				var rows = 5000;
+				if(url.query){
+					rows = dojo.queryToObject(url.query).rows||rows;
+				}
 				timing.tic("transferTime");
 				dojo.xhrGet({
 					handleAs: "text",
 					url: "data.jsp",
 					content: {
 						output: "json",
-						count: 5000,
+						count: rows,
 						start: 0
 					},
 					load: function(data, ioArgs){

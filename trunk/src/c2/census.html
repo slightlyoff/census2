@@ -58,6 +58,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		dojo.require("dojox.dtl.filter.misc");
 		dojo.require("dojox.dtl.filter.logic");
 		dojo.require("dojox.dtl.Context");
+		dojo.require("dijit.form.NumberSpinner");
 
 		// TODO:
 		//		* finish the "guided" pane
@@ -212,7 +213,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			_inFlightTests: [],
 			_flightTimer: null,
 			_doTestRun: function(){
-				dojo.byId("testContent").src = this.file;
+				dojo.byId("testContent").src = this.file+"?"+dojo.objectToQuery({
+					rows: (rowCount||this.rowCount)
+				});
 			},
 			_killFlightTimer: function(){
 				if(this._inFlightTimer){
@@ -228,6 +231,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				}
 			}
 		});
+
+		testsByFile = function(f){
+			console.debug(f);
+			return dojo.filter(testList, function(t){ return f == t.file; }),
+		}
 
 		runSelected = function(all){
 			var items = all ? tests.children :
@@ -276,7 +284,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			dataPane.updateGrid();
 		}
 
-		testCount = 1;
+		testCount = 5;
+		rowCount = 5000;
 		testList = null;
 
 		perfChart = null;
@@ -382,7 +391,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 							{ name: "Render Time", time: getTimeLabel(a.renderTime) }
 						]
 					});
-					var tmpl = new dojox.dtl.Template("<table>{% for k in items %}<tr><td style='text-align: right;'>{{ k.name }} :</td><td>{{ k.time }}</td></tr>{% endfor %}</table>");
+					var tmpl = new dojox.dtl.Template([
+						"<table>{% for k in items %}",
+							"<tr>",
+								"<td style='text-align: right;'>{{ k.name }} :</td>",
+								"<td style='text-align: right; font-weight: bold;'>{{ k.time }}</td>",
+							"</tr>",
+						"{% endfor %}</table>"
+					].join(""));
 					return tmpl.render(ctx);
 				}
 			});
@@ -437,7 +453,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			new dojox.charting.action2d.Tooltip(bandChart, "default", {
 				text: function(o){ 
 					var item = testList[o.index];
-					return "Bandwidth: "+getDataLabel(item.averages.bandwidth);
+					return "Bandwidth: <b>"+getDataLabel(item.averages.bandwidth)+"</b>";
 				}
 			});
 
@@ -469,7 +485,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			new dojox.charting.action2d.Tooltip(totalTimeChart, "default", {
 				text: function(o){ 
 					var item = testList[o.index];
-					return "Total Test Time: " + getTimeLabel(item.averages.total);
+					return "Total Test Time: <b>" + getTimeLabel(item.averages.total)+"</b>";
 				}
 			});
 
@@ -537,6 +553,53 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 					style="width: 100%;">
 					Run 'Em All
 				</button>
+				Rows: <div dojoType="dijit.form.NumberSpinner"
+					constraints="{ max: 20000, min: 0 }"
+					smallDelta="500"
+					largeDelta="1000"
+					class="testSpinner"
+					style="width: 150px;">
+					<script type="dojo/method">
+						this.attr("value", rowCount);
+					</script>
+					<script type="dojo/connect" event="onChange">
+						rowCount = this.attr("value");
+					</script>
+				</div>
+				<br>
+				Count: <div dojoType="dijit.form.NumberSpinner" constraints="{ max: 100, min: 0 }"
+					class="testSpinner"
+					style="width: 40px;">
+					<script type="dojo/method">
+						this.attr("value", testCount);
+					</script>
+					<script type="dojo/connect" event="onChange">
+						testCount = this.attr("value");
+					</script>
+				</div>
+				<script type="dojo/method">
+					dojo.connect("setTestList", function(){
+						dojo.forEach(testList.slice(0).reverse(), function(i){
+							var o = dojo.doc.createElement("option");
+							dojo.attr(o, {
+								innerHTML: i.desc,
+								value: i.file
+							});
+							dojo.place(o, "testListDropDown", "last");
+						});
+					});
+					dojo.connect(dojo.byId("testListDropDown"), "onchange", function(){
+						// console.dir(this);
+						var t = testsByFile(this.value)[0];
+						if(!t){ return; }
+						console.debug(t);
+						dojo.byId("guideTitle").innerHTML = t.desc;
+					});
+				</script>
+				<select id="testListDropDown">
+				</select>
+				<h4 id="guideTitle"></h4>
+				<div id="guideDetail"></div>
 			</div>
 
 			<!-- the "Navigator" UI -->

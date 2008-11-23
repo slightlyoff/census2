@@ -279,3 +279,8 @@ table.rawData tfoot td {
 	text-align: right;
 	padding-right: 10px;
 }
+
+/* we won't have invalid values */
+.census .testSpinner .dijitValidationIcon {
+	display: none;
+}
