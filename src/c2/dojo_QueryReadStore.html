@@ -26,6 +26,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		<script type="text/javascript" src="dojo/dojo/dojo.js" djConfig="parseOnLoad: true"></script>
 		<script type="text/javascript" src="dojo/dojo/cookie.js"></script>
 		<script type="text/javascript" src="resources/timing.js"></script>
+		<!-- script include things to improve performance/parallelism -->
+		<script type="text/javascript" src="dojo/dijit/dijit.js"></script>
+		<script type="text/javascript" src="dojo/dojox/grid/DataGrid.js"></script>
+		<script type="text/javascript" src="dojo/dojox/data/QueryReadStore.js"></script>
 		<script type="text/javascript">
 			dojo.require("dojo.cookie");
 			dojo.require("dijit.dijit");
@@ -83,9 +87,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 					timing.setTime("transferTime", tt-st);
 					timing.tic("parseTime");
 
+					var url = new dojo._Url(window.location);
+					var rows = 5000;
+					if(url.query){
+						rows = dojo.queryToObject(url.query).rows||rows;
+					}
+
 					return {
 						// numRows: data.length,
-						numRows: 5000,
+						numRows: rows,
 						identifier: "id",
 						label: "age",
 						items: data

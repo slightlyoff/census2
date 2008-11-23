@@ -55,13 +55,18 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 			dojo.addOnLoad(function(){
 
+				var url = new dojo._Url(window.location);
+				var rows = 5000;
+				if(url.query){
+					rows = dojo.queryToObject(url.query).rows||rows;
+				}
 				timing.tic("transferTime");
 				dojo.xhrGet({
 					handleAs: "xml",
 					url: "data.jsp",
 					content: {
 						output: "xml",
-						count: 5000,
+						count: rows,
 						start: 0
 					},
 					load: function(doc, ioArgs){
