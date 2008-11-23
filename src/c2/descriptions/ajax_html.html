@@ -1,0 +1,18 @@
+Method:
+<p>
+	Make an XMLHttpRequest to the server for pre-rendered HTML tables of data.
+	The results are injected into the document using innerHTML. Tables have a
+	style sheet applied which uses a fixed width and specifies <code>table-layout:
+	fixed;</code> to avoid reflow calculations.
+</p>
+Results:
+<p>
+	For small numbers of rows (&lt; 1000), this method renders fastest despite
+	using a relatively verbose format on the wire, in part since the data
+	doesn't need to be transformed in any way before rendering. At large
+	numbers of rows (&gt; 3000), HTML tables suffer against their "smarter"
+	competitors since they need to both transfer and render all the rows in the
+	grid. Compared to Flex and Dojo grids, these HTML tables are incredibly
+	inflexible and provide the fewest features but for small data sets are
+	hands-down fastest.
+</p>

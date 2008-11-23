@@ -284,3 +284,9 @@ table.rawData tfoot td {
 .census .testSpinner .dijitValidationIcon {
 	display: none;
 }
+
+code {
+	background: black;
+	border: none;
+	font-size: 0.9em;
+}
