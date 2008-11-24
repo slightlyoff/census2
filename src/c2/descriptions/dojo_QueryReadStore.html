@@ -1,0 +1,36 @@
+Method:
+<p>
+	Create a Dojo Grid component and back it with a paginating data store which
+	only requests a small amount more data than is required to display the
+	first group of rows. Dojo's <code>dojox.data.QueryReadStore</code> has been
+	configured for this test and the rendered grid structure is declared in
+	markup so as not to give Dojo advantage that other tests don't enjoy.
+</p>
+Results:
+<p>
+	For big data, this is the out-and-out winner. Not only does the grid
+	provide significanly improved features versus static HTML tables, but the
+	ability to fetch 3K of JSON data for a 5000 row grid when naive XML views
+	requires 1.3MB for the same task allows the Dojo grid to provide superior
+	responsiveness.
+</p>
+<p>
+	But it's not all sunshine and light. At lower row counts, the overhead of
+	loading Dojo and rendering a sophisticated view of the data starts to show.
+	For tests with only 500 rows, the Dojo-based grid can be up to 3x as slow,
+	even with the QueryReadStore reducing the amount of data requested to a
+	relative trickle.
+</p>
+<p>
+	The verdict? If you need the features of a rich grid with lockable rows and
+	columns, sorting, and all the rest, you can know that throwing huge amounts
+	of data at the Dojo Grid when combined with the QueryReadStore will keep
+	you out of trouble with regards to performance. Perhaps best of all,
+	hooking up the Grid to the QueryReadStore versus the ItemFileReadStore used
+	in the JSON tests doesn't require changes to the way a grid is declared or
+	used. In essence, the Dojo Grid + QRS provides a fixed overhead for data
+	visualization...a godsend when building products for unknown data sets at
+	customer sites. If your UI needs are more limited, consider something lighter
+	weight like HTML tables plus <code>dojo.behavior</code> or
+	<code>dojo.query</code> to add event handlers or client-side sorting.
+</p>

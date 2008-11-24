@@ -9,19 +9,19 @@
 		"name": "Ajax: XML",
 		"desc": "XML to HTML table",
 		"file": "ajax_xml.html",
-		"longDescUrl": "descriptions/intro.html"
+		"longDescUrl": "descriptions/ajax_xml.html"
 	},
 	{
 		"name": "Ajax: XML via XSLT",
 		"desc": "XML to HTML table via XSLT",
 		"file": "ajax_xml_xslt.html",
-		"longDescUrl": "descriptions/intro.html"
+		"longDescUrl": "descriptions/ajax_xml_xslt.html"
 	},
 	{
 		"name": "Ajax: JSON",
 		"desc": "JSON to HTML table",
 		"file": "ajax_json.html",
-		"longDescUrl": "descriptions/intro.html"
+		"longDescUrl": "descriptions/ajax_json.html"
 	},
 	{
 		"disabled": true,
@@ -34,13 +34,14 @@
 		"name": "Dojo: JSON",
 		"desc": "JSON to Dojo Grid",
 		"file": "dojo_json.html",
-		"longDescUrl": "descriptions/intro.html"
+		"longDescUrl": "descriptions/dojo_json.html"
 	},
 	{
 		"name": "Dojo: QRS",
 		"desc": "Dojo Grid via QueryReadStore",
 		"file": "dojo_QueryReadStore.html",
 		"longDescUrl": "descriptions/intro.html"
+		"longDescUrl": "descriptions/dojo_QueryReadStore.html"
 	},
 	{
 		"disabled": true,
