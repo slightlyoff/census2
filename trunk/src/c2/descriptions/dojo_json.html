@@ -1,0 +1,26 @@
+Method:
+<p>
+	Create a Dojo Grid component and back it with a data that loads all of the
+	rows via a single XMLHttpRequest for JSON-encoded data. Returned JSON data
+	is processed to encapsulate it as "items" for consumption by the data APIs
+	and then rendered to a Dojo Grid. The rendered grid structure is declared
+	in markup so as not to give Dojo advantage that other tests don't enjoy.
+</p>
+Results:
+<p>
+	Slow...but not nearly as bad as XML. For large data sets, the overhead of
+	fetching the entire set of rows is partially offset by the Grid's smarts
+	not rendering rows that aren't immediately in view. Users, however, do pay
+	a price both to load Dojo and for the inherently more feature-rich Dojo
+	Grid. HTML tables don't provide sorting, filtering, locked headers, and
+	many of the other features of the Dojo Grid, so it's not entirely
+	apples-to-apples.
+</p>
+<p>
+	If you need the features of a sophisticated Grid component, this might be a
+	good way to get started, but as your data sets grow you should swap out the
+	relatively slow <code>dojo.data.ItemFileReadStore</code> for the efficient
+	<code>dojox.data.QueryReadStore</code>. If you have more limited needs of a
+	grid, consider server-generated HTML plus <code>dojo.query()</code> for
+	adding behaviors like sorting.
+</p>

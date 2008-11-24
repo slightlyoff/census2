@@ -1,0 +1,18 @@
+Method:
+<p>
+	Make an XMLHttpRequest to the server for JSON data which is decoded with
+	<code>eval()</code> and then iterated over to create the markp for the
+	table. The markup is then injected into the document using innerHTML.
+	Tables have a style sheet applied which uses a fixed width and specifies
+	<code>table-layout: fixed;</code> to avoid reflow calculations.
+</p>
+Results:
+<p>
+	This method is relatively parsimonious with network resources due to the
+	reduced amount of encoding cruft inherent in JSON versus HTML or XML. Never
+	the less, JSON data must be parsed before display and iterated on to build
+	the resulting UI. Since this test fetches the entire set of rendered rows
+	and uses string concatenation to create the HTML to create the table, this
+	test stresses the browser's JavaScript engine performance vs. fetching
+	pre-rendered rows.
+</p>

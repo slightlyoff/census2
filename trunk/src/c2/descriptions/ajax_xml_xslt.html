@@ -1,0 +1,42 @@
+Method:
+<p>
+	Make an XMLHttpRequest to the server for XML encoded rows of data and then
+	transform it by loading another XML document (an XSLT style sheet) for the
+	built-in transformation engine to use. The overhead of an extra request is
+	non-trivial for small data sets where the extra time may dwarf the
+	transformation time itself.
+</p>
+<p>
+	The transformation step itself diverges based on browser. On IE, it's
+	possible to transform the document to a string which is then injected using
+	innerHTML. On other browser the document is transformed into a DOM
+	DocumentFragment which is then re-parented into the page since the
+	XSLTProcessor class does not provide a simple "transform to string" API.
+</p>
+Results:
+<p>
+	XML is piggy, but by offloading the XSLT transform onto native code, we can
+	perhaps do better than script-based transformations...right?
+</p>
+<p>
+	Ish.
+</p>
+<p>
+	For large numbers of rows, offloading the overhead of client transformation
+	to native code can show dramatic overall speed gains. For instance, in
+	Firefox 3.0 the total time to transform 5000 rows via XSLT is roughly half
+	that of the same transform done in script. As scripting engines get faster,
+	this delta may close, but XSLT is likely to remain highly competitive.
+</p>
+<p>
+	For lower row counts, the inherent disadvantages of needing to load data in
+	XML and pulling in a separate style sheet begin to show. For a test with
+	only 500 rows, XSLT still maintains a slight edge over JSON, but the
+	advantage is minimal and neither are quite as fast as raw HTML from the
+	server.
+</p>
+<p>
+	If you happen to have data on the server in XML format, might potentially
+	need a lot of it,  and need to transform it to a static view you can't beat
+	XSLT. On the downside, you'll need to learn XSLT. Oof.
+</p>
