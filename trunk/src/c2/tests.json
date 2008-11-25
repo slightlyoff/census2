@@ -40,7 +40,6 @@
 		"name": "Dojo: QRS",
 		"desc": "Dojo Grid via QueryReadStore",
 		"file": "dojo_QueryReadStore.html",
-		"longDescUrl": "descriptions/intro.html"
 		"longDescUrl": "descriptions/dojo_QueryReadStore.html"
 	},
 	{

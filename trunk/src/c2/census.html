@@ -518,7 +518,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				"totalTimeLegendNode"
 			);
 
-			}catch(e){ console.error(e); }
+			}catch(e){ alert(e); console.error(e); }
 		}
 
 		updateCharts = function(){
@@ -579,30 +579,39 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				<button dojoType="dijit.form.Button" onClick="runSelected(true);">
 					Run Next
 				</button>
-				Rows: <div dojoType="dijit.form.NumberSpinner"
-					constraints="{ max: 20000, min: 0 }"
-					smallDelta="500"
-					largeDelta="1000"
-					class="testSpinner"
-					style="width: 150px;">
-					<script type="dojo/method">
-						this.attr("value", rowCount);
-					</script>
-					<script type="dojo/connect" event="onChange">
-						rowCount = this.attr("value");
-					</script>
-				</div>
-				<br>
-				Count: <div dojoType="dijit.form.NumberSpinner" constraints="{ max: 100, min: 0 }"
-					class="testSpinner"
-					style="width: 40px;">
-					<script type="dojo/method">
-						this.attr("value", testCount);
-					</script>
-					<script type="dojo/connect" event="onChange">
-						testCount = this.attr("value");
-					</script>
-				</div>
+				<table style="text-align: right;">
+					<tr><td>Rows:</td>
+						<td>
+							<div dojoType="dijit.form.NumberSpinner"
+								constraints="{ max: 20000, min: 0 }"
+								smallDelta="500"
+								largeDelta="1000"
+								class="testSpinner"
+								style="width: 60px;">
+								<script type="dojo/method">
+									this.attr("value", rowCount);
+								</script>
+								<script type="dojo/connect" event="onChange">
+									rowCount = this.attr("value");
+								</script>
+							</div>
+						</td>
+					</tr>
+					<tr><td>Test Count:</td>
+						<td>
+							<div dojoType="dijit.form.NumberSpinner" constraints="{ max: 100, min: 0 }"
+								class="testSpinner"
+								style="width: 60px;">
+								<script type="dojo/method">
+									this.attr("value", testCount);
+								</script>
+								<script type="dojo/connect" event="onChange">
+									testCount = this.attr("value");
+								</script>
+							</div>
+						</td>
+					</tr>
+				</table>
 				<script type="dojo/method" event="setDefaults">
 					$("#guideTitle").html("\"Guide Me\" Mode");
 					$("#guideDetail").xhr("descriptions/intro.html");
@@ -631,6 +640,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 						if(!t){ return; }
 						$("#guideTitle").html(t.desc);
 						$("#guideDetail").xhr(t.longDescUrl);
+						runTests([ t ]);
 					});
 				</script>
 				<select id="testListDropDown">

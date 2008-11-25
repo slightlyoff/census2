@@ -264,7 +264,7 @@ table.rawData td {
 }
 
 table.rawData td.odd {
-	background-color: #151515
+	background-color: #151515;
 }
 
 table.rawData thead td,
@@ -280,9 +280,37 @@ table.rawData tfoot td {
 	padding-right: 10px;
 }
 
+.census .testSpinner {
+	background-image: none;
+	background-color: #b8b8b8;
+	border: 1px solid #434343; /* #2a2a2a; */
+}
+
+.census .testSpinner .dijitSpinnerButtonContainer {
+	width: 12px;
+	background: none;
+	background-image: none;
+}
+
+.census .testSpinner .dijitButtonNode {
+	border-width: 0px;
+	width: 12px;
+	background: none;
+	background-image: none;
+}
+
+.census .testSpinner input {
+	border: none;
+}
+
 /* we won't have invalid values */
 .census .testSpinner .dijitValidationIcon {
 	display: none;
+}
+
+.census .testSpinner .dijitInputField {
+	background-color: #2a2a2a;
+	background-image: none;
 }
 
 code {
