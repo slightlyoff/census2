@@ -76,6 +76,7 @@ dependencies = {
 				"dojox.dtl.filter.misc",
 				"dojox.dtl.filter.logic",
 				"dojox.dtl.Context",
+				"dijit.form.NumberSpinner",
 			]
 		},
 	],

@@ -1,30 +1,58 @@
 This version of the census app has been developed explicitly to reduce the
-number of dependencies on external installations of software that real people
+number of dependencies on external installations of software that developers
 are unlikely to have installed. Therefore, a shell script is provided to
 automate much of the process of fetching and building dependencies. A premium
 is placed on ease of installation and speed in getting up and running. If you
 make changes which will require new software, please ensure that the
-installation process is added to get_deps.sh
+installation process is added to get_deps.sh and ensure that every attempt is
+made to allow ensure portability on unix-like systems.
 
 To add new test types:
+----------------------
 
 	* add the installation of any resources the test type will require to
 	  get_deps.sh
 	* add the description and the HTML file to kick the test off from in
 	  src/c2/tests.json
+	* add a longer discussion about the test (if any) to a file in 
+	  src/c2/descriptions/ and ensure that it's correctly referenced by the
+	  "longDesc" entry in tsets.json
 	* ensure that any build steps are added to make_census.sh
 
 Notes on dependencies:
+----------------------
 
 	* the Flex SDK is currently using Flex 3. Since there's very little client
 	  code actually required, we may not download the whole thing at some point
 	  in the future.
-	* in src/, there's a directory called "charting" which contains a pre-1.2.2
-	  version of Dojo Charting. This is used along-side the stock Dojo 1.2.1
-	  release in order to get some features (namely the ability to set a
-	  minimum bar thickness) that were added post Dojo 1.2.1. When 1.2.2 or 1.3
-	  are released, this directory will go away.
-	* we assume that BlazeDS will be running in a separate Java VM due to the
-	  configuration hassle of getting it up-and-running. Anything that *really*
-	  requires J2EE is over-wrought and badly designed...particularly if it's
-	  just shoveling data.
+	* in src/, there's a directory called "dojo_patches" which contains a pre-1.3
+	  version of various dojox packages. These versions are used along-side the
+	  stock Dojo 1.2.2 release in order to get some features that were added
+	  post Dojo 1.2.2. When Dojo 1.3 is released, this directory will likely go
+	  away. If you need updated versions of dojox packages, add them here and
+	  ensure that they are coped in via the build sections of get_deps.sh.
+	* we assume that BlazeDS or LCDS will be running in a separate Java VM due
+	  to the configuration hassle of getting it up-and-running. Please do not
+	  attempt to add them to run in-process if you are extending the tests to
+	  depend on them. Anything that *really* requires J2EE is over-wrought and
+	  badly designed...particularly if it's just shoveling data.
+
+Joining the project:
+--------------------
+
+	If you're extending Census 2, please post patches in the bug tracking
+	feature of the Google Code site for the project:
+
+		http://code.google.com/p/census2
+
+	If you'd like commit priveledges to add tests directly, please email the
+	project owner (Alex Russell, alex@dojotoolkit.org) and note your acceptance
+	of the license terms (LGPL v2) and your agreement with to contribute your
+	new tests under those terms. No formal code style guidelines are in place,
+	but in general tests should be written in the style suggested by the
+	official Dojo JavaScript Style Guide.
+
+		http://dojotoolkit.org/styleguide
+	
+	Thanks in advance for your help in improving the accuracy, fairness, and
+	performance of this test suite.
