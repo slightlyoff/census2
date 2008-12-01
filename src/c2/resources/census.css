@@ -68,6 +68,10 @@ a {
 	-webkit-border-radius: 3px;
 }
 
+.census .dijitProgressBarIndeterminateHighContrastImage {
+	display: none;
+}
+
 .census .leftContainer .dijitTabPane {
 	font-size: 1em;
 	line-height: 1.2em;
@@ -249,6 +253,10 @@ a {
 	min-height: 100px;
 }
 
+#guideDetail p {
+	font-size: 0.9em;
+}
+
 table.rawData {
 	margin: 0px;
 	padding: 0px;
@@ -285,6 +293,15 @@ table.rawData tfoot td {
 	background-color: #b8b8b8;
 	border: 1px solid #434343; /* #2a2a2a; */
 }
+
+/*
+.census .dijitSpinner,
+.census .dijitProgressBarFull,
+.census .dijitProgressBarEmpty {
+	background: none;
+	background-image: none;
+}
+*/
 
 .census .testSpinner .dijitSpinnerButtonContainer {
 	width: 12px;
