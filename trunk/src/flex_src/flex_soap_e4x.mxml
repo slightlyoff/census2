@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2007 James Ward
+http://www.jamesward.org
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+-->
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+  horizontalAlign="center"
+  backgroundColor="#1a1a1a"
+  backgroundGradientAlphas="[1.0, 1.0]"
+  backgroundGradientColors="[0x1a1a1a, 0x1a1a1a]"
+  paddingTop="0"
+  paddingBottom="0"
+  paddingLeft="0"
+  paddingRight="0"
+  usePreloader="false"
+  preinitialize="Font.registerFont(BaseRSL.myriadWebPro);Font.registerFont(BaseRSL.myriadWebProBold);"
+  creationComplete="initApp()"
+  frameRate="99">
+
+  <mx:Metadata>
+    [SWF(backgroundColor="0x1a1a1a")]
+  </mx:Metadata>
+
+  <mx:Style source="flex.css"/>
+
+  <mx:Script>
+  <![CDATA[
+  import mx.core.mx_internal;
+
+  use namespace mx_internal;
+      
+  [Bindable]
+  public var rows:Number;
+
+  private var gzip:Boolean;
+  private var startTime:Number;
+  private var sendResult:Boolean = false;
+  private var conn:LocalConnection;
+  private var testResult:TestResult;
+      
+  private function initApp():void
+  {
+    conn = new LocalConnection();
+    rows = new Number(parameters.rows);
+    gzip = new Boolean(parameters.gzip);
+
+    var url:String  = "services/CensusService?id=flex_soap_e4x";
+
+    if (gzip)
+    {
+      url += "&gzip=true";
+    }
+
+    srv.endpointURI = url;
+
+    testResult = new TestResult("flex_soap_e4x");
+    testResult.rows = rows;
+    startTime = (new Date()).time;
+    sendResult = true;
+    srv.getElements(0,rows);
+  }
+      
+  private function done():void
+  {
+    if (sendResult)
+    {
+      var now:Number = new Date().time;
+      testResult.renderTime = (now - startTime);
+      testResult.memory = flash.system.System.totalMemory;
+      conn.send("census_lc", "testDone", testResult);
+    }
+    sendResult = false;
+  }
+
+  private function loadComplete(event:Event):void
+  {
+    var now:Number = new Date().time;
+    testResult.transferTime = (now - startTime);
+    startTime = (new Date()).time;
+  }
+
+  private function handleLoad():void
+  {
+    srv.getElements.asyncRequest.addEventListener('acknowledge',loadComplete);
+  }
+
+  private function parseDone():void
+  {
+    var now:Number = new Date().time;
+    testResult.parseTime = (now - startTime);
+    startTime = (new Date()).time;
+  }
+  ]]>
+  </mx:Script>
+
+  <mx:WebService id="srv" wsdl="services/CensusService?wsdl" load="handleLoad()" result="parseDone()">
+    <mx:operation name="getElements" resultFormat="e4x"/>
+  </mx:WebService>
+  
+  <mx:DataGrid dataProvider="{srv.getElements.lastResult[0].*}" width="100%" height="100%" updateComplete="done()">
+    <mx:columns>
+    <mx:DataGridColumn dataField="id" sortable="true">
+      <mx:itemRenderer>
+       <mx:Component>
+       <mx:Label text="{(data as XML).n::id}">
+         <mx:Script>
+         <![CDATA[
+           private namespace n = "http://census.jamesward.org";
+           use namespace n; 
+         ]]>
+         </mx:Script> 
+       </mx:Label>
+       </mx:Component>
+      </mx:itemRenderer>
+    </mx:DataGridColumn>
+    <mx:DataGridColumn dataField="age" sortable="true">
+      <mx:itemRenderer>
+       <mx:Component>
+       <mx:Label text="{(data as XML).n::age}">
+         <mx:Script>
+         <![CDATA[
+           private namespace n = "http://census.jamesward.org";
+           use namespace n; 
+         ]]>
+         </mx:Script> 
+       </mx:Label>
+       </mx:Component>
+      </mx:itemRenderer>
+    </mx:DataGridColumn>
+    <mx:DataGridColumn dataField="classOfWorker" sortable="true">
+      <mx:itemRenderer>
+       <mx:Component>
+       <mx:Label text="{(data as XML).n::classOfWorker}">
+         <mx:Script>
+         <![CDATA[
+           private namespace n = "http://census.jamesward.org";
+           use namespace n; 
+         ]]>
+         </mx:Script> 
+       </mx:Label>
+       </mx:Component>
+      </mx:itemRenderer>
+    </mx:DataGridColumn>
+    <mx:DataGridColumn dataField="education" sortable="true">
+     <mx:itemRenderer>
+       <mx:Component>
+       <mx:Label text="{(data as XML).n::education}">
+         <mx:Script>
+         <![CDATA[
+           private namespace n = "http://census.jamesward.org";
+           use namespace n; 
+         ]]>
+         </mx:Script> 
+       </mx:Label>
+       </mx:Component>
+      </mx:itemRenderer>
+    </mx:DataGridColumn>
+    <mx:DataGridColumn dataField="maritalStatus" sortable="true">
+     <mx:itemRenderer>
+       <mx:Component>
+       <mx:Label text="{(data as XML).n::maritalStatus}">
+         <mx:Script>
+         <![CDATA[
+           private namespace n = "http://census.jamesward.org";
+           use namespace n; 
+         ]]>
+         </mx:Script> 
+       </mx:Label>
+       </mx:Component>
+      </mx:itemRenderer>
+    </mx:DataGridColumn>
+    <mx:DataGridColumn dataField="race" sortable="true">
+     <mx:itemRenderer>
+       <mx:Component>
+       <mx:Label text="{(data as XML).n::race}">
+         <mx:Script>
+         <![CDATA[
+           private namespace n = "http://census.jamesward.org";
+           use namespace n; 
+         ]]>
+         </mx:Script> 
+       </mx:Label>
+       </mx:Component>
+      </mx:itemRenderer>
+    </mx:DataGridColumn>
+    <mx:DataGridColumn dataField="sex" sortable="true">
+     <mx:itemRenderer>
+       <mx:Component>
+       <mx:Label text="{(data as XML).n::sex}">
+         <mx:Script>
+         <![CDATA[
+           private namespace n = "http://census.jamesward.org";
+           use namespace n; 
+         ]]>
+         </mx:Script> 
+       </mx:Label>
+       </mx:Component>
+      </mx:itemRenderer>
+    </mx:DataGridColumn>
+    </mx:columns>
+  </mx:DataGrid>
+  
+</mx:Application>

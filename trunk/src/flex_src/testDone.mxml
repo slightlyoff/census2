@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2007 James Ward
+http://www.jamesward.org
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+-->
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+  styleName="plain"
+  usePreloader="false"
+  initialize="initApp()"
+  creationComplete="createComplete()"
+  backgroundColor="#1a1a1a"
+  backgroundGradientAlphas="[1.0,1.0]"
+  backgroundGradientColors="[0x1a1a1a, 0x1a1a1a]"
+  frameRate="99"
+  >
+
+  <mx:Script>
+  <![CDATA[
+      
+  private var conn:LocalConnection;
+
+  private function initApp():void
+  {
+    conn = new LocalConnection();
+    ExternalInterface.addCallback("sendLoadTimeResult", sendLoadTimeResult);
+    ExternalInterface.addCallback("sendParseTimeResult", sendParseTimeResult);
+    ExternalInterface.addCallback("sendRenderTimeResult", sendRenderTimeResult);
+  }
+
+  private function createComplete():void
+  {
+    ExternalInterface.call("loadData");
+  }
+      
+  public function sendLoadTimeResult(id:String, loadTime:Number, rows:Number, memory:Number):void
+  {
+    var testResult:TestResult = new TestResult(id);
+    testResult.rows = rows;
+    testResult.transferTime = loadTime;
+    testResult.parseTime = -1;
+    testResult.renderTime = -1;
+    callLater(conn.send, ["census_lc", "testDone", testResult]);
+    //conn.send("census_lc", "testDone", testResult);
+  }
+
+  public function sendParseTimeResult(id:String, parseTime:Number, rows:Number, memory:Number):void
+  {
+    var testResult:TestResult = new TestResult(id);
+    testResult.rows = rows;
+    testResult.transferTime = -1;
+    testResult.parseTime = parseTime;
+    testResult.renderTime = -1;
+    callLater(conn.send, ["census_lc", "testDone", testResult]);
+    //conn.send("census_lc", "testDone", testResult);
+  }
+
+  public function sendRenderTimeResult(id:String, renderTime:Number, rows:Number, memory:Number):void
+  {
+    var testResult:TestResult = new TestResult(id);
+    testResult.rows = rows;
+    testResult.transferTime = -1;
+    testResult.parseTime = -1;
+    testResult.renderTime = renderTime;
+    callLater(conn.send, ["census_lc", "testDone", testResult]);
+    //conn.send("census_lc", "testDone", testResult);
+  }
+  ]]>
+  </mx:Script>
+
+</mx:Application>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2007 James Ward
+http://www.jamesward.org
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+-->
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+  horizontalAlign="center"
+  backgroundColor="#1a1a1a"
+  backgroundGradientAlphas="[1.0, 1.0]"
+  backgroundGradientColors="[0x1a1a1a, 0x1a1a1a]"
+  paddingTop="0"
+  paddingBottom="0"
+  paddingLeft="0"
+  paddingRight="0"
+  usePreloader="false"
+  preinitialize="Font.registerFont(BaseRSL.myriadWebPro);Font.registerFont(BaseRSL.myriadWebProBold);"
+  creationComplete="initApp()"
+  frameRate="99">
+
+  <mx:Metadata>
+    [SWF(backgroundColor="0x1a1a1a")]
+  </mx:Metadata>
+
+  <mx:Style source="flex.css"/>
+
+  <mx:Script>
+  <![CDATA[
+  import mx.collections.ArrayCollection;
+
+  [Bindable]
+  public var items:ArrayCollection = new ArrayCollection();
+
+  private var startTime:Number;
+  private var sendResult:Boolean = false;
+  private var conn:LocalConnection;
+  private var testResult:TestResult;
+			
+  private function initApp():void
+  {
+    conn = new LocalConnection();
+    testResult = new TestResult("flex_paged");
+    loadData();
+  }
+
+  private function loadData():void
+  {
+    ds.pageSize = numRows.value;
+    startTime = new Date().time;
+    ds.fill(items);
+  }
+      
+  private function done():void
+  {
+    if (sendResult)
+    {
+      var now:Number = new Date().time;
+      testResult.renderTime = (now - startTime);
+      testResult.memory =  flash.system.System.totalMemory;
+      testResult.rows = ds.pageSize;
+      conn.send("census_lc", "testDone", testResult);
+    }
+    sendResult = false;
+  }
+
+  private function handleResult(event:Event):void
+  {
+    var now:Number = new Date().time;
+    testResult.transferTime = (now - startTime);
+    testResult.parseTime = 0;
+    sendResult = true;
+    startTime = (new Date()).time;
+  }
+  ]]>
+  </mx:Script>
+
+  <mx:HBox verticalAlign="middle">
+    <mx:Label text="Page Size:" fontWeight="bold"/>
+    <mx:HSlider id="numRows" width="200" minimum="0" maximum="1000" value="100" snapInterval="100" tickInterval="100" labels="['0','1,000']" dataTipPrecision="0" liveDragging="false" showTrackHighlight="true"/>
+    <mx:Button label="Load First Page of Data ({numRows.value} rows)" click="loadData()"/>
+  </mx:HBox>
+
+  <mx:DataService id="ds" destination="census-ds" result="handleResult(event)"/>
+
+  <mx:DataGrid id="dg" dataProvider="{items}" width="100%" height="100%" updateComplete="done()">
+    <mx:columns>
+      <mx:DataGridColumn dataField="id" sortable="true"/>
+      <mx:DataGridColumn dataField="age" sortable="true"/>
+      <mx:DataGridColumn dataField="classOfWorker" sortable="true"/>
+      <mx:DataGridColumn dataField="education" sortable="true"/>
+      <mx:DataGridColumn dataField="maritalStatus" sortable="true"/>
+      <mx:DataGridColumn dataField="race" sortable="true"/>
+      <mx:DataGridColumn dataField="sex" sortable="true"/>
+    </mx:columns>
+  </mx:DataGrid>
+
+</mx:Application>

@@ -1,0 +1,367 @@
+<?xml version="1.0"?>
+<project name="census" default="help">
+
+  <property environment="env"/>
+  <property name="jboss.home"        value="${env.JBOSS_HOME}"/>
+  <property name="lcds.home"         value="${env.LCDS_HOME}"/>
+  <property name="flex.war"          value="${lcds.home}/lcds.war"/>
+  <property name="src.java.dir"      value="src/java"/>
+  <property name="src.flex.dir"      value="src/flex"/>
+  <property name="src.census.dir"    value="src/census.war"/>
+  <property name="src.blazebench.dir"    value="src/blazebench.war"/>
+  <property name="src.laszlo.dir"    value="src/laszlo"/>
+  <property name="laszlo.home"       value="${env.LPS_HOME}/Server/lps-4.0.3"/>
+
+  <macrodef name="compileflex">
+    <attribute name="src"/>
+    <attribute name="dest"/>
+    <attribute name="app"/>
+    <element name="uptodatefiles" optional="true"/>
+    <sequential>
+      <uptodate property="@{src}.uptodate" targetfile="@{dest}">
+        <srcfiles file="@{src}"/>
+        <srcfiles file="build/base.swc"/>
+        <srcfiles file="${src.flex.dir}/flex.css"/>
+        <srcfiles dir="build/@{app}.war/WEB-INF/flex" includes="*.xml"/>
+        <uptodatefiles/>
+      </uptodate>
+      <antcall target="compilemxml">
+        <param name="src" value="@{src}"/>
+        <param name="dest" value="@{dest}"/>
+        <param name="app" value="@{app}"/>
+      </antcall>
+    </sequential>
+  </macrodef>
+
+  <path id="laszlo.lib">
+    <pathelement location="${laszlo.home}/WEB-INF/lps/server/build" />
+    <pathelement location="${laszlo.home}/WEB-INF/classes" />
+    <fileset dir = "${laszlo.home}/3rd-party/jars/dev" includes="**/*.jar"/>
+    <fileset dir = "${laszlo.home}/WEB-INF/lib" includes="**/*.jar"/>
+  </path>
+
+  <target name="compilemxml" unless="${src}.uptodate">
+    <java jar="${flex.sdk.dir}/lib/mxmlc.jar" fork="true" maxmemory="128m">
+      <jvmarg value="-Dapplication.home=${flex.sdk.dir}"/>
+      <!--<arg value="+flexlib=build/census.war/WEB-INF/flex"/>-->
+      <arg value="-external-library-path+=build/base.swc"/>
+      <arg value="-library-path+=lib/rpc-189826.swc"/>
+      <arg value="-runtime-shared-libraries=base.swf"/>
+      <arg value="-licenses.license" />
+      <arg value="flexbuilder3"/>
+      <arg value="${flexbuilder3}"/>
+      <arg value="-compiler.services" />
+      <arg value="build/${app}.war/WEB-INF/flex/services-config.xml" />
+      <arg value="-compiler.context-root" />
+      <arg value="/${app}" />
+      <arg value="-file-specs" />
+      <arg value="${src}" />
+      <arg value="-output" />
+      <arg value="${dest}" />
+    </java>  
+  </target>
+
+  <target name="compilersl" unless="rsluptodate">
+    <java jar="${flex.sdk.dir}/lib/compc.jar" fork="true" maxmemory="128m">
+      <jvmarg value="-Dapplication.home=${flex.sdk.dir}"/>
+      <arg value="-debug=false" />
+      <arg value="-o=build/base.swc" />
+      <arg value="-source-path+=${src.flex.dir}" />
+      <arg value="BaseRSL"/>
+    </java>
+
+    <unzip src="build/base.swc" dest="build"/>
+
+    <delete dir="build/mx"/>
+    <delete dir="build/locale"/>
+    <delete file="build/catalog.xml"/>
+
+    <java jar="${flex.sdk.dir}/lib/optimizer.jar" fork="true" maxmemory="128m">
+      <jvmarg value="-Dapplication.home=${flex.sdk.dir}"/>
+      <arg value="-input=build/library.swf" />
+      <arg value="-output=build/base.swf" />
+    </java>
+
+    <delete file="build/library.swf"/>
+  </target>
+
+  <target name="prepare-census">
+
+    <tstamp/>
+
+    <fail message="Please set JBOSS_HOME to your JBoss 4.2.1GA dir">
+      <condition>
+        <not>
+          <available file="${jboss.home}/client/servlet-api.jar" type="file"/>
+        </not>
+      </condition>
+    </fail>
+
+    <property name="flex.sdk.dir"      value="${lcds.home}/resources/flex_sdk"/>
+    <property file="${lcds.home}/license.properties"/>
+
+	<!--
+    <fail message="Please set LCDS_HOME to a vanilla Flex Data Services install dir.  You must also follow the instructions in the resources/flex_sdk/readme.txt file to complete the install.">
+      <condition>
+        <or>
+          <not>
+            <available file="${flex.war}" type="file"/>
+          </not>
+          <not>
+            <available file="${flex.sdk.dir}/lib/mxmlc.jar" type="file"/>
+          </not>
+        </or>
+      </condition>
+    </fail>
+
+    <fail message="Please set LPS_HOME to a Laszlo 4.0.3 install.">
+      <condition>
+        <not>
+          <available file="${laszlo.home}/WEB-INF/lib/lps-4.0.3.jar" type="file"/>
+        </not>
+      </condition>
+    </fail>
+	-->
+
+    <mkdir dir="build"/>
+  </target>
+
+  <target name="prepare-blazebench">
+
+    <tstamp/>
+
+    <fail message="Please set JBOSS_HOME to your JBoss 4.2.1GA dir">
+      <condition>
+        <not>
+          <available file="${jboss.home}/client/servlet-api.jar" type="file"/>
+        </not>
+      </condition>
+    </fail>
+
+    <property name="flex.sdk.dir" value="${env.FLEX_HOME}"/>
+    <property file="${flex.sdk.dir}/frameworks/license.properties"/>
+    
+    <available file="${flex.sdk.dir}/lib/mxmlc.jar" property="flex.exists"/>
+
+    <fail unless="flex.exists"
+      message="In order to compile the Flex code, you need to set FLEX_HOME to the Flex SDK dir. You can get the flex framework by downloading the Flex 3 SDK from http://labs.adobe.com/"/>
+
+    <java jar="${flex.sdk.dir}/lib/mxmlc.jar" outputproperty="flex.version" fork="true">
+      <arg value="--version"/>
+    </java>
+
+    <condition property="flex.correctVersion">
+      <contains string="${flex.version}" substring="Version 3.0"/>
+    </condition>
+
+    <fail unless="flex.correctVersion" message="You must use the Flex SDK version 3"/>
+
+    <mkdir dir="build"/>
+  </target>
+
+  <target name="build-census-war" depends="prepare-census">
+
+    <unjar src="${flex.war}" dest="build/census.war" overwrite="false"/>
+
+    <delete file="build/census.war/index.htm"/>
+
+    <mkdir dir="build/census.war/WEB-INF/lib"/>
+    <mkdir dir="build/census.war/WEB-INF/classes"/>
+    <javac srcdir="${src.java.dir}" destdir="build/census.war/WEB-INF/classes"
+      classpath="${jboss.home}/client/servlet-api.jar:build/census.war/WEB-INF/lib/flex-messaging-core.jar:build/census.war/WEB-INF/lib/flex-messaging-common.jar:lib/json-lib-2.2.2-jdk15.jar:lib/commons-logging-1.0.4.jar"/>
+
+    <copy todir="build/census.war" preservelastmodified="true">
+      <fileset dir="${src.census.dir}"/>
+    </copy>
+
+    <copy file="etc/flex/flex-webtier-config.xml"
+      todir="build/census.war/WEB-INF/flex" preservelastmodified="true" overwrite="true"/>
+    <copy file="etc/flex/data-management-config.xml"
+      todir="build/census.war/WEB-INF/flex" preservelastmodified="true" overwrite="true"/>
+    <copy file="etc/flex/remoting-config.xml"
+      todir="build/census.war/WEB-INF/flex" preservelastmodified="true" overwrite="true"/>
+    <copy file="etc/flex/services-config.xml"
+      todir="build/census.war/WEB-INF/flex" preservelastmodified="true" overwrite="true"/>
+    <copy file="etc/flex/messaging-config.xml"
+      todir="build/census.war/WEB-INF/flex" preservelastmodified="true" overwrite="true"/>
+    <copy file="${lcds.home}/license.properties"
+      todir="build/census.war/WEB-INF/flex" preservelastmodified="true" overwrite="true"/>
+
+    <copy file="etc/web/server-config.wsdd"
+      todir="build/census.war/WEB-INF" preservelastmodified="true" overwrite="true"/>
+    <copy file="etc/web/web.xml"
+      todir="build/census.war/WEB-INF" preservelastmodified="true" overwrite="true"/>
+    <copy file="etc/web/services.xml"
+      todir="build/census.war/WEB-INF/classes/META-INF/xfire"
+      preservelastmodified="true" overwrite="true"/>
+
+    <copy todir="build/census.war/WEB-INF/lib" preservelastmodified="true">
+      <fileset dir="lib"/>
+    </copy>
+
+    <mkdir dir="build/census.war/WEB-INF/db"/>
+    <copy todir="build/census.war/WEB-INF/db" preservelastmodified="true">
+      <fileset dir="etc/db"/>
+    </copy>
+
+    <uptodate property="rsluptodate" targetfile="build/base.swc">
+      <srcfiles file="${src.flex.dir}/BaseRSL.as"/>
+      <srcfiles file="${src.flex.dir}/mx/controls/TextInput.as"/>
+    </uptodate>
+
+    <antcall target="compilersl"/>
+
+    <copy file="build/base.swf" todir="build/census.war" preservelastmodified="true"/>
+
+    <parallel threadsPerProcessor="1">
+    <compileflex src="${src.flex.dir}/flex_xml_as.mxml" dest="build/census.war/flex_xml_as.swf" app="census"/>
+
+    <compileflex src="${src.flex.dir}/flex_xml_e4x.mxml" dest="build/census.war/flex_xml_e4x.swf" app="census"/>
+
+    <!--
+    <compileflex src="${src.flex.dir}/flex_json.mxml" dest="build/census.war/flex_json.swf"/>
+    -->
+
+    <compileflex src="${src.flex.dir}/flex_soap_as.mxml" dest="build/census.war/flex_soap_as.swf" app="census"/>
+
+    <compileflex src="${src.flex.dir}/flex_soap_e4x.mxml" dest="build/census.war/flex_soap_e4x.swf" app="census"/>
+
+    <compileflex src="${src.flex.dir}/flex_amf0.mxml" dest="build/census.war/flex_amf0.swf" app="census"/>
+    
+    <compileflex src="${src.flex.dir}/flex_amf3.mxml" dest="build/census.war/flex_amf3.swf" app="census"/>
+
+    <compileflex src="${src.flex.dir}/flex_paged.mxml" dest="build/census.war/flex_paged.swf" app="census"/>
+    </parallel>
+
+    <compileflex src="${src.flex.dir}/testDone.mxml" dest="build/census.war/testDone.swf" app="census"/>
+
+    <compileflex src="${src.flex.dir}/census.mxml" dest="build/census.war/index.swf" app="census">
+      <uptodatefiles>
+        <srcfiles file="${src.flex.dir}/Test.as"/>
+        <srcfiles dir="${src.flex.dir}" includes="Wizard*"/>
+        <srcfiles file="${src.flex.dir}/IFrame.mxml"/>
+        <srcfiles file="${src.flex.dir}/BarItemRenderer.as"/>
+        <srcfiles file="${src.flex.dir}/ChartBackgroundFill.as"/>
+        <srcfiles file="${src.flex.dir}/ChartLegendCombo.mxml"/>
+        <srcfiles file="${src.flex.dir}/CheckBoxIcon.as"/>
+        <srcfiles file="${src.flex.dir}/CustomAxisRenderer.mxml"/>
+        <srcfiles file="${src.flex.dir}/ConfirmDialog.mxml"/>
+        <srcfiles file="${src.flex.dir}/DataGridHeaderSeparator.as"/>
+        <srcfiles file="${src.flex.dir}/ArrowButton.as"/>
+        <srcfiles file="${src.flex.dir}/ButtonSkin.as"/>
+        <srcfiles file="${src.flex.dir}/ScrollArrowSkin.as"/>
+        <srcfiles file="${src.flex.dir}/ScrollThumbSkin.as"/>
+        <srcfiles file="${src.flex.dir}/NumericStepperDownSkin.as"/>
+        <srcfiles file="${src.flex.dir}/NumericStepperUpSkin.as"/>
+        <srcfiles file="${src.flex.dir}/NumericStepperBorderSkin.as"/>
+        <srcfiles file="${src.flex.dir}/leftIcon.png"/>
+        <srcfiles file="${src.flex.dir}/rightIcon.png"/>
+      </uptodatefiles>
+    </compileflex>
+
+	<!--
+    <java classname="org.openlaszlo.compiler.Main" fork="true" failonerror="true" classpathref="laszlo.lib">
+        <jvmarg value = "-DLPS_HOME=${laszlo.home}"/>
+        <arg line="- -dir build/census.war - -runtime=swf7 - -onerror warn ${src.laszlo.dir}/laszlo_xml.lzx" />
+    </java>
+
+    <move file="build/census.war/laszlo_xml.lzr=swf7.swf" tofile="build/census.war/laszlo_xml.swf"/>
+	-->
+
+  </target>
+
+  <target name="build-blazebench-war" depends="prepare-blazebench">
+
+    <copy todir="build/blazebench.war" preservelastmodified="true">
+      <fileset dir="${src.blazebench.dir}"/>
+    </copy>
+
+    <javac srcdir="${src.java.dir}" destdir="build/blazebench.war/WEB-INF/classes"
+      classpath="${jboss.home}/client/servlet-api.jar:build/blazebench.war/WEB-INF/lib/flex-messaging-core.jar:build/blazebench.war/WEB-INF/lib/flex-messaging-common.jar:lib/json-lib-1.0-jdk15.jar:lib/commons-logging-1.0.4.jar"/>
+
+    <copy todir="build/blazebench.war/WEB-INF/lib" preservelastmodified="true">
+      <fileset dir="lib"/>
+    </copy>
+
+    <mkdir dir="build/blazebench.war/WEB-INF/db"/>
+    <copy todir="build/blazebench.war/WEB-INF/db" preservelastmodified="true">
+      <fileset dir="etc/db"/>
+    </copy>
+
+    <!-- todo: copy source files -->
+
+    <uptodate property="rsluptodate" targetfile="build/base.swc">
+      <srcfiles file="${src.flex.dir}/BaseRSL.as"/>
+      <srcfiles file="${src.flex.dir}/mx/controls/TextInput.as"/>
+    </uptodate>
+
+    <antcall target="compilersl"/>
+
+    <copy file="build/base.swf" todir="build/blazebench.war" preservelastmodified="true"/>
+
+    <parallel threadsPerProcessor="1">
+      <compileflex src="${src.flex.dir}/flex_xml_as.mxml" dest="build/blazebench.war/flex_xml_as.swf" app="blazebench"/>
+
+      <compileflex src="${src.flex.dir}/flex_amf3.mxml" dest="build/blazebench.war/flex_amf3.swf" app="blazebench"/>
+    </parallel>
+
+    <compileflex src="${src.flex.dir}/testDone.mxml" dest="build/blazebench.war/testDone.swf" app="blazebench"/>
+
+    <compileflex src="${src.flex.dir}/blazebench.mxml" dest="build/blazebench.war/index.swf" app="blazebench">
+      <uptodatefiles>
+        <srcfiles file="${src.flex.dir}/Test.as"/>
+        <srcfiles dir="${src.flex.dir}" includes="Wizard*"/>
+        <srcfiles file="${src.flex.dir}/IFrame.mxml"/>
+        <srcfiles file="${src.flex.dir}/BarItemRenderer.as"/>
+        <srcfiles file="${src.flex.dir}/ChartBackgroundFill.as"/>
+        <srcfiles file="${src.flex.dir}/ChartLegendCombo.mxml"/>
+        <srcfiles file="${src.flex.dir}/CheckBoxIcon.as"/>
+        <srcfiles file="${src.flex.dir}/CustomAxisRenderer.mxml"/>
+        <srcfiles file="${src.flex.dir}/ConfirmDialog.mxml"/>
+        <srcfiles file="${src.flex.dir}/DataGridHeaderSeparator.as"/>
+        <srcfiles file="${src.flex.dir}/ArrowButton.as"/>
+        <srcfiles file="${src.flex.dir}/ButtonSkin.as"/>
+        <srcfiles file="${src.flex.dir}/ScrollArrowSkin.as"/>
+        <srcfiles file="${src.flex.dir}/ScrollThumbSkin.as"/>
+        <srcfiles file="${src.flex.dir}/NumericStepperDownSkin.as"/>
+        <srcfiles file="${src.flex.dir}/NumericStepperUpSkin.as"/>
+        <srcfiles file="${src.flex.dir}/NumericStepperBorderSkin.as"/>
+        <srcfiles file="${src.flex.dir}/leftIcon.png"/>
+        <srcfiles file="${src.flex.dir}/rightIcon.png"/>
+      </uptodatefiles>
+    </compileflex>
+
+  </target>
+
+  <target name="deploy-census-war" depends="build-census-war">
+    <copy todir="${jboss.home}/server/default/deploy">
+      <fileset dir="build" excludes="base.swc,base.swf,blazebench.war"/>
+    </copy>
+	<!--
+    <copy todir="${jboss.home}/server/census/deploy">
+      <fileset dir="build" excludes="base.swc,base.swf,blazebench.war"/>
+    </copy>
+	-->
+    <!--<touch file="${jboss.home}/server/census/deploy/census.war/WEB-INF/web.xml"/>-->
+  </target>
+
+  <target name="deploy-blazebench-war" depends="build-blazebench-war">
+    <copy todir="${jboss.home}/server/census/deploy">
+      <fileset dir="build" excludes="base.swc,base.swf,census.war"/>
+    </copy>
+    <!--<touch file="${jboss.home}/server/census/deploy/census.war/WEB-INF/web.xml"/>-->
+  </target>
+
+  <target name="clean">
+    <delete dir="build"/>
+  </target>
+
+  <target name="help">
+    <echo>
+      Set JBOSS_HOME to your JBoss 4.0.4GA dir
+      Set LCDS_HOME to a vanilla Live Cycle Data Services install
+      Run ant deploy-war
+    </echo>
+  </target>
+
+</project>
