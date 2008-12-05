@@ -1,4 +1,5 @@
 #summary The skinny on getting the census benchmark up and running.
+#labels Featured
 
 = Introduction =
 
@@ -24,7 +25,7 @@ Or, if you'd like to keep up-to-date with the project, ensure that you have the 
 
 {{{
 %> cd parentDir
-%> svn co http://FIXME/census2/trunk census2
+%> svn co http://census2.googlecode.com/svn/trunk/ census2
 ...
 %> cd census2
 }}}
