@@ -1,0 +1,742 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2007 James Ward
+http://www.jamesward.org
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+-->
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+  xmlns="*"
+  preinitialize="Font.registerFont(BaseRSL.myriadWebPro);Font.registerFont(BaseRSL.myriadWebProBold);"
+  initialize="initApp()"
+  creationComplete="compApp()"
+  layout="vertical"
+  backgroundColor="#000000"
+  backgroundGradientAlphas="[1.0, 1.0]"
+  backgroundGradientColors="[0x000000, 0x000000]"
+  paddingTop="10"
+  paddingBottom="10"
+  paddingLeft="10"
+  paddingRight="10"
+  verticalScrollPolicy="off"
+  frameRate="99"
+  viewSourceURL="http://flexapps.cvs.sourceforge.net/flexapps/census/"
+  >
+
+  <mx:Metadata>
+  [SWF(backgroundColor="0x1a1a1a")]
+  </mx:Metadata>
+
+  <mx:Style source="flex.css"/>
+
+  <mx:Script>
+  <![CDATA[
+  import flash.text.Font;
+
+  import mx.managers.CursorManager;
+  import mx.managers.CursorManagerPriority;
+  import mx.managers.PopUpManager;
+  import mx.styles.StyleManager;
+  import mx.messaging.events.MessageEvent;
+  import mx.collections.ArrayCollection;
+  import mx.rpc.events.ResultEvent;
+  import mx.charts.HitData;
+  import mx.charts.chartClasses.IAxis;
+  import mx.formatters.NumberFormatter;
+  import mx.skins.halo.BusyCursor;
+  import mx.controls.Alert;
+  import mx.utils.ObjectUtil;
+
+  [Bindable]
+  public var tests:ArrayCollection = new ArrayCollection(
+      [new Test("Ajax HTML", "ajax_html", "Server built HTML table", -1),
+      new Test("Ajax SOAP", "ajax_soap", "SOAP to HTML table", 12000),
+      new Test("Ajax XML", "ajax_xml", "XML to HTML table", 12000),
+      new Test("Ajax JSON", "ajax_json", "JSON to HTML table", -1),
+      new Test("Dojo", "dojo", "JSON to Dojo FilteringTable", 500),
+      new Test("Laszlo XML", "laszlo_xml", "XML to grid", 10000),
+      new Test("Flex SOAP AS", "flex_soap_as", "SOAP to AS objects", -1),
+      new Test("Flex SOAP E4X", "flex_soap_e4x", "SOAP to E4X objects", -1),
+      new Test("Flex XML AS", "flex_xml_as", "XML to AS objects", -1),
+      new Test("Flex XML E4X", "flex_xml_e4x", "XML to E4X objects", -1),
+      new Test("Flex AMF3", "flex_amf3", "RemoteObject AMF3", -1),
+      new Test("Flex Paged", "flex_paged", "DataService with data paging", -1)]);
+      //new Test("Flex AMF0", "flex_amf0", "RemoteObject with AMF0 encoding"),
+      
+  [Bindable]
+  public var displayResults:ArrayCollection = new ArrayCollection();
+
+  [Bindable]
+  public var selectedTests:ArrayCollection = new ArrayCollection();
+
+  [Bindable]
+  public var textStyleSheet:StyleSheet;
+
+  [Bindable]
+  public var legendIndent:int = 0;
+
+  [Bindable]
+  public var legendVisible:Boolean = false;
+
+  [Bindable]
+  public var shelfOpenText:String = "<b>Charts</b>";
+
+  [Bindable]
+  public var shelfClosedText:String = "<b>Output</b>";
+
+  private var testQueue:Array = new Array();
+
+  private var actualResults:ArrayCollection;
+
+  private var conn:LocalConnection;
+
+  private var cursorID:Number = 0;
+
+  public function getShelfText(s1:String, s2:String, p:Number):String
+  {
+    if (mainPanelHBox.x == 0)
+    {
+      return shelfClosedText;
+    }
+    return shelfOpenText;
+  }
+
+  private function initApp():void
+  {
+    for each (var test:Test in tests)
+    {
+      var testResult:TestResult = new TestResult(test.id);
+      testResult.name = test.name + " ";
+      displayResults.addItemAt(testResult, 0);
+    }
+  }
+
+  private function compApp():void
+  {
+    conn = new LocalConnection();
+    conn.client = this;
+    try
+    {
+      // do special handling
+      conn.connect("census_lc");
+    }
+    catch (error:ArgumentError)
+    {
+      Alert.show("Make sure you only have one browser running this application.  If your browser recently crashed, then your LocalConnection is now in a hung state.  The only way to un-hang the LocalConnection is to restart your computer.  This is due to a Flash bug.", "Error making Flash LocalConnection!");
+    }
+
+    srv.send();
+
+    var aLink:Object = new Object();
+    aLink.color = "#bbbbbb";
+
+    var aHover:Object = new Object();
+    aHover.color = "#bbbbbb";
+    aHover.textDecoration = "underline";
+
+    textStyleSheet = new StyleSheet();
+    textStyleSheet.setStyle("a:link", aLink);
+    textStyleSheet.setStyle("a:Hover", aHover);
+
+    welcomeText.styleSheet = textStyleSheet;
+  }
+
+  private function handleResult(event:ResultEvent):void
+  {
+    consumer.subtopic = (event.result.sessionId as String);
+    consumer.subscribe();
+  }
+
+  private function runTest(test:Test, warn:Boolean):void
+  {
+    if ((numRows.value >= test.warnNumRows) && (test.warnNumRows != -1) && warn)
+    {
+      // display warning
+      var c:ConfirmDialog = new ConfirmDialog();
+      c.test = test;
+      c.runTest = runTest;
+      c.x = 10;
+      c.y = 10;
+      PopUpManager.addPopUp(c, this, true);
+    }
+    else
+    {
+      resetTest(test);
+
+      // preset the num rows in the result
+      var displayResult:TestResult = getDisplayResultById(test.id);
+      displayResult.rows = numRows.value;
+
+      CursorManager.removeAllCursors();
+      cursorID = CursorManager.setCursor(StyleManager.getStyleDeclaration("CursorManager").getStyle("busyCursor"), CursorManagerPriority.HIGH);
+
+      shelfClosedText = "<b>Output</b>    (" + test.name + " - " + numRows.value + " Rows)    Running Benchmark...";
+      shelfOpenText = "<b>Charts</b>    Running Benchmark...";
+
+      var testURL:String = test.id + ".html?rows=" + numRows.value;
+      if (enableGZip.selected)
+      {
+        testURL += "&gzip=true";
+      }
+
+      iFrame.source = testURL;
+
+      // rehide the iframe if it's hidden
+      if (!(iFrame.visible))
+      {
+        iFrame.visible = false;
+      }
+    }
+  }
+
+  private function resetTest(test:Test):void
+  {
+    var displayResult:TestResult = getDisplayResultById(test.id);
+    displayResult.serverExecTime = 0;
+    displayResult.transferTime = 0;
+    displayResult.parseTime = 0;
+    displayResult.renderTime = 0;
+    displayResult.memory = 0;
+    displayResult.bandwidth = 0;
+  }
+
+  private function getDisplayResultById(id:String):TestResult
+  {
+    for each (var o:TestResult in displayResults)
+    {
+      if (o.id == id)
+      {
+        return o;
+        break;
+      }
+    }
+    return null;
+  }
+
+  private function messageHandler(event:MessageEvent):void
+  {
+    if (event.message.body != null)
+    {
+      var displayResult:TestResult = getDisplayResultById(event.message.body.id);
+      displayResult.name = getTestsById(event.message.body.id).name;
+      displayResult.serverExecTime = event.message.body.execTime;
+      displayResult.bandwidth = event.message.body.contentLength;
+
+      if (displayResult.transferTime != 0)
+      {
+        displayResult.transferTime -= displayResult.serverExecTime;
+        CursorManager.removeCursor(cursorID);
+      }
+    }
+  }
+
+  public function testDone(testResult:Object):void
+  {
+    var displayResult:TestResult = getDisplayResultById(testResult.id);
+    displayResult.name = getTestsById(testResult.id).name;
+    displayResult.rows = testResult.rows;
+    if (testResult.transferTime != -1)
+    {
+      // we already have the results from the server
+
+      displayResult.transferTime = testResult.transferTime;
+      if ((displayResult.serverExecTime != 0) && (displayResult.transferTime > displayResult.serverExecTime))
+      {
+        displayResult.transferTime -= displayResult.serverExecTime;
+        CursorManager.removeCursor(cursorID);
+        shelfClosedText = "<b>Output</b>    (" + displayResult.name + " - " + displayResult.rows + " Rows)    Benchmark Completed";
+        shelfOpenText = "<b>Charts</b>    Benchmark Completed";
+      }
+    }
+    if (testResult.parseTime != -1)
+    {
+      displayResult.parseTime = testResult.parseTime;
+    }
+    if (testResult.renderTime != -1)
+    {
+      displayResult.renderTime = testResult.renderTime;
+    }
+    if (testResult.memory != -1)
+    {
+      displayResult.memory = testResult.memory;
+    }
+  }
+
+  private function getTestsById(id:String):Test
+  {
+    for each (var test:Test in tests)
+    {
+      if (test.id == id)
+      {
+        return test;
+      }
+    }
+    return null;
+  }
+
+  private function byteFormat(labelValue:Object, previousValue:Object=null, axis:IAxis=null):String
+  {
+    var nf:NumberFormatter = new NumberFormatter();
+    nf.precision = 1;
+    var n:Number = new Number(labelValue);
+    if (n >= 1000000)
+    {
+      return nf.format(n / 1000000) + "M";
+    }
+    else if (n >= 1000)
+    {
+      return nf.format(n / 1000) + "K";
+    }
+    else
+    {
+      return nf.format(n) + "B";
+    }
+  }
+
+  private function timeFormat(labelValue:Object, previousValue:Object=null, axis:IAxis=null):String
+  {
+    var nf:NumberFormatter = new NumberFormatter();
+    nf.precision = 1;
+    var n:Number = new Number(labelValue);
+    if (n >= 1000)
+    {
+      return nf.format(n / 1000) + "s";
+    }
+    else
+    {
+      return nf.format(n) + "ms";
+    }
+  }
+
+  private function getBandwidthDataTip(hitData:HitData):String
+  {
+    return "<b>" + hitData.item.name + " - " + hitData.item.rows + " Rows</b>" +
+      "<br/>Bandwidth: " + 
+      byteFormat(hitData.item.bandwidth);
+  }
+
+  private function getTimeDataTip(hitData:HitData):String
+  {
+    return "<b>" + hitData.item.name + " - " + hitData.item.rows + " Rows</b>" +
+      "<br/>Server Exec Time: " + timeFormat(hitData.item.serverExecTime) +
+      "<br/>Transfer Time: " + timeFormat(hitData.item.transferTime) +
+      "<br/>Parse Time: " + timeFormat(hitData.item.parseTime) +
+      "<br/>Render Time: " + timeFormat(hitData.item.renderTime) +
+      "<br/>Total Time: " + timeFormat(hitData.item.serverExecTime + hitData.item.transferTime + hitData.item.parseTime + hitData.item.renderTime);
+  }
+
+  private function getMemoryDataTip(hitData:HitData):String
+  {
+    return "<b>" + hitData.item.name + " - " + hitData.item.rows + " Rows</b>" +
+      "<br/>Memory: " + byteFormat(hitData.item.memory);
+  }
+
+  private function wizardVSChange(event:Event):void
+  {
+    if ((wizardVS.selectedChild as WizardBase).testId != null)
+    {
+      numRows.value = (wizardVS.selectedChild as WizardBase).rows;
+      runTest(getTestsById((wizardVS.selectedChild as WizardBase).testId), true);
+    }
+  }
+
+  ]]>
+  </mx:Script>
+  
+  <mx:HTTPService id="srv" url="servlet/CensusServiceServlet?command=getSessionId" result="handleResult(event)"/>
+
+  <mx:Consumer id="consumer" destination="accessLogDestination" message="messageHandler(event)"/>
+
+  <mx:SeriesInterpolate id="interpolate"/>
+
+  <mx:HBox width="100%" height="100%" maxHeight="620" horizontalGap="0" backgroundColor="#1a1a1a">
+
+    <mx:VBox width="275" height="100%" borderThickness="1" borderColor="#2b2b2b" borderStyle="solid" borderSides="top left bottom" horizontalAlign="center" verticalGap="0">
+      <mx:Spacer height="15"/>
+      <mx:LinkBar height="25" dataProvider="{navVS}"/>
+      <mx:HRule width="90%" strokeColor="#313131" strokeWidth="1"/>
+      <mx:Spacer height="10"/>
+      <mx:ViewStack id="navVS" width="100%" height="100%" creationPolicy="all" paddingLeft="10" paddingRight="10" paddingBottom="10">
+        <mx:VBox label="Guide Me" width="100%" height="100%">
+          <WizardNav dataProvider="{wizardVS}"/>
+          <mx:Box width="100%" height="100%" backgroundAlpha="1" backgroundColor="#151515" borderStyle="solid" borderColor="#111111">
+            <mx:ViewStack id="wizardVS" width="100%" height="100%" change="wizardVSChange(event)" selectedIndex="0">
+              <Wizard0/>
+              <Wizard1/>
+              <Wizard2/>
+              <Wizard3/>
+              <Wizard4/>
+              <Wizard5/>
+              <Wizard6/>
+              <!--
+              <Wizard7/>
+              <Wizard8/>
+              <Wizard9/>
+              <Wizard10/>
+              <Wizard11/>
+              <Wizard12/>
+              <Wizard13/>
+              <Wizard14/>
+              <Wizard15/>
+              <Wizard16/>
+              -->
+            </mx:ViewStack>
+          </mx:Box>
+        </mx:VBox>
+        <mx:VBox label="Navigator" width="100%" height="100%">
+          <mx:HBox width="100%" verticalAlign="middle" horizontalAlign="center" horizontalGap="3">
+            <mx:Label text="Rows" paddingTop="2"/>
+            <mx:NumericStepper id="numRows" minimum="500" maximum="20000" stepSize="500" value="5000" useHandCursor="true" buttonMode="true" height="26" width="60" textIndent="0"/>
+            <mx:CheckBox id="enableGZip" label="GZip" labelPlacement="left" width="55" selected="true" useHandCursor="true" buttonMode="true" mouseChildren="false"/>
+            <mx:Button id="runButton" height="26" label="Execute" click="runTest(testList.selectedItem as Test, true)" enabled="{testList.selectedItem != null}" icon="@Embed(source='rightIcon.png')" paddingLeft="3" useHandCursor="{testList.selectedItem != null}" buttonMode="true" toolTip="Select a test to run"/>
+          </mx:HBox>
+          <mx:List id="testList" width="100%" height="100%" dataProvider="{tests}">
+            <mx:itemRenderer>
+              <mx:Component>
+                <mx:HBox paddingTop="0" paddingBottom="0" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+                  <mx:Label text="{data.name}" fontSize="10" width="80" color="#cccccc"/>
+                  <mx:Label text="{data.description}" fontSize="10"/>
+                </mx:HBox>
+              </mx:Component>
+            </mx:itemRenderer>
+          </mx:List>
+        </mx:VBox>
+        <mx:VBox label="Help" width="100%" height="100%">
+          <mx:TextArea id="welcomeText" width="100%" height="100%" borderColor="#111111" backgroundColor="#151515" paddingLeft="5" paddingRight="5" editable="false">
+            <mx:htmlText><![CDATA[To be guided through the various benchmarks and learn about each test use the "Guide Me" mode.  If you just want to run the tests on your own, use the "Navigator" mode.
+
+The goal of this application is to demonstrate various methods of loading data in RIAs and see how those methods impact performance, bandwidth, and client memory usage.  These benchmarks aim to be honest and unbiased.  Thus they are open source and anyone can submit patches to have new tests added or to have the existing tests improved.  Yet, these tests should always fairly represent real world uses of these technologies.
+
+Make sure you disable FireBug when running these benchmarks.
+
+<b>Useful Links:</b>
+<a href="http://sourceforge.net/projects/flexapps" target="_blank">Source Forge Project Page</a>
+<a href="http://flexapps.cvs.sourceforge.net/flexapps/census/" target="_blank">Code in CVS</a>
+<a href="http://www.flex.org/" target="_blank">Flex</a>
+<a href="http://www.guru4.net/" target="_blank">JavaScript SOAP Library</a>
+
+
+
+<b>Copyright (C) 2007 James Ward</b>
+All original parts of this application are licensed under GPLv2.
+]]>
+            </mx:htmlText>
+          </mx:TextArea>
+        </mx:VBox>
+      </mx:ViewStack>
+    </mx:VBox>
+
+    <mx:HBox height="100%" width="5" horizontalGap="0">
+      <mx:VRule height="100%" strokeColor="#2a2a2a" strokeWidth="1"/>
+      <mx:VRule height="100%" strokeColor="#111111" strokeWidth="1"/>
+      <mx:VRule height="100%" strokeColor="#111111" strokeWidth="1" alpha="0.6"/>
+      <mx:VRule height="100%" strokeColor="#111111" strokeWidth="1" alpha="0.3"/>
+      <mx:VRule height="100%" strokeColor="#111111" strokeWidth="1" alpha="0.15"/>
+    </mx:HBox>
+
+    <mx:Canvas id="mainPanel" width="100%" height="100%" borderThickness="1" borderColor="#2b2b2b" borderStyle="solid" borderSides="right" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+    <mx:HBox id="mainPanelHBox" width="{(mainPanel.width * 2) - 27}" height="100%" horizontalGap="0" moveEffect="Move">
+      <mx:effectEnd>
+      if (mainPanelHBox.x == 0)
+      {
+        // slid right, hide right shadow
+        rightShadow.width = 0;
+      }
+      else
+      {
+        // slid left, hide the left shadow
+        leftShadow.width = 0;
+
+        // show the iframe
+        iFrame.visible = true;
+      }
+      </mx:effectEnd>
+    <mx:VBox id="chartPanel" width="100%" height="100%" horizontalAlign="left" verticalGap="0" paddingLeft="4" paddingRight="4" paddingBottom="4" borderThickness="1" borderColor="#2b2b2b" borderStyle="solid" borderSides="top bottom">
+      <mx:Spacer height="40"/>
+      <mx:HBox width="100%" paddingLeft="15" paddingRight="15">
+        <mx:HRule width="100%" strokeColor="#313131" strokeWidth="1"/>
+      </mx:HBox>
+      <mx:Spacer height="10"/>
+      <mx:HBox horizontalGap="0" width="100%">
+        <mx:Spacer width="{legendIndent}"/>
+        <mx:Legend dataProvider="{loadRenderTimeChart}" direction="horizontal" markerWidth="15" width="100%" visible="{legendVisible}"/>
+      </mx:HBox>
+      <mx:BarChart id="loadRenderTimeChart" width="100%" height="100%" dataProvider="{displayResults}" showDataTips="true" fontSize="10" dataTipFunction="getTimeDataTip" type="stacked">
+        <mx:updateComplete>
+        legendIndent = loadRenderTimeChart.computedGutters.x - 4;
+        callLater(function():void {legendVisible = true});
+        </mx:updateComplete>
+
+        <mx:backgroundElements>
+          <mx:GridLines visible="false"/>
+          <ChartBackgroundFill>
+            <fill>
+              <mx:SolidColor color="#151515"/>
+            </fill>
+          </ChartBackgroundFill>
+        </mx:backgroundElements>
+
+        <mx:verticalAxis>
+          <mx:CategoryAxis categoryField="name"/>
+        </mx:verticalAxis>
+  
+        <mx:verticalAxisRenderer>
+          <CustomAxisRenderer id="chartLeftAxisRenderer" tickPlacement="outside" tickLength="6"/>
+        </mx:verticalAxisRenderer>
+        <mx:secondVerticalAxisRenderer>
+          <CustomAxisRenderer showLabels="false" minorTickPlacement="none" tickPlacement="none"/>
+        </mx:secondVerticalAxisRenderer>
+  
+        <mx:horizontalAxis>
+          <mx:LinearAxis labelFunction="timeFormat"/>
+        </mx:horizontalAxis>
+  
+        <mx:horizontalAxisRenderer>
+          <CustomAxisRenderer/>
+        </mx:horizontalAxisRenderer>
+        <mx:secondHorizontalAxisRenderer>
+          <CustomAxisRenderer showLabels="false" minorTickPlacement="none" tickPlacement="none"/>
+        </mx:secondHorizontalAxisRenderer>
+
+        <mx:series>
+          <mx:BarSeries xField="serverExecTime" itemRenderer="BarItemRenderer" showDataEffect="{interpolate}" displayName="Server Exec Time">
+            <mx:fill>
+              <mx:LinearGradient angle="90">
+                <mx:entries>
+                  <mx:Array>
+                    <mx:GradientEntry color="#e28741" ratio="0" alpha="100"/>
+                    <mx:GradientEntry color="#c6691c" ratio="0.9" alpha="100"/>
+                    <mx:GradientEntry color="#000000" ratio="1" alpha="100"/>
+                  </mx:Array>
+                </mx:entries>
+              </mx:LinearGradient>
+            </mx:fill>
+          </mx:BarSeries>
+          <mx:BarSeries xField="transferTime" itemRenderer="BarItemRenderer" showDataEffect="{interpolate}" displayName="Transfer Time">
+            <mx:fill>
+              <mx:LinearGradient angle="90">
+                <mx:entries>
+                  <mx:Array>
+                    <mx:GradientEntry color="#467299" ratio="0" alpha="100"/>
+                    <mx:GradientEntry color="#2a547a" ratio="0.9" alpha="100"/>
+                    <mx:GradientEntry color="#000000" ratio="1" alpha="100"/>
+                  </mx:Array>
+                </mx:entries>
+              </mx:LinearGradient>
+            </mx:fill>
+          </mx:BarSeries>
+          <mx:BarSeries xField="parseTime" itemRenderer="BarItemRenderer" showDataEffect="{interpolate}" displayName="Parse Time">
+            <mx:fill>
+              <mx:LinearGradient angle="90">
+                <mx:entries>
+                  <mx:Array>
+                    <mx:GradientEntry color="#f6c54c" ratio="0" alpha="100"/>
+                    <mx:GradientEntry color="#d8a62d" ratio="0.9" alpha="100"/>
+                    <mx:GradientEntry color="#000000" ratio="1" alpha="100"/>
+                  </mx:Array>
+                </mx:entries>
+              </mx:LinearGradient>
+            </mx:fill>
+          </mx:BarSeries>
+          <mx:BarSeries xField="renderTime" itemRenderer="BarItemRenderer" showDataEffect="{interpolate}" displayName="Render Time">
+            <mx:fill>
+              <mx:LinearGradient angle="90">
+                <mx:entries>
+                  <mx:Array>
+                    <mx:GradientEntry color="#ff3f20" ratio="0" alpha="100"/>
+                    <mx:GradientEntry color="#c92719" ratio="0.9" alpha="100"/>
+                    <mx:GradientEntry color="#000000" ratio="1" alpha="100"/>
+                  </mx:Array>
+                </mx:entries>
+              </mx:LinearGradient>
+            </mx:fill>
+          </mx:BarSeries>
+        </mx:series>
+  
+      </mx:BarChart>
+
+      <mx:HBox horizontalGap="0">
+        <mx:Spacer width="{legendIndent}"/>
+        <ChartLegendCombo id="clc" charts="{[bandwidthChart,memoryChart]}" visible="{legendVisible}">
+          <change>
+          if (clc.selectedIndex == 1)
+          {
+            bottomChartsVBox.y = (bandwidthChart.height * -1);
+          }
+          else
+          {
+            bottomChartsVBox.y = 0;
+          }
+          </change>
+        </ChartLegendCombo>
+      </mx:HBox>
+
+      <mx:Canvas id="bottomChartsCanvas" width="100%" height="100%" verticalScrollPolicy="off" horizontalScrollPolicy="off">
+        <mx:VBox id="bottomChartsVBox" width="100%" height="{bottomChartsCanvas.height * 2}" verticalGap="0" moveEffect="Move">
+          <mx:BarChart id="bandwidthChart" width="100%" height="100%" dataProvider="{displayResults}" showDataTips="true" fontSize="10" dataTipFunction="getBandwidthDataTip">
+                    
+            <mx:verticalAxis>
+              <mx:CategoryAxis categoryField="name"/>
+            </mx:verticalAxis>
+  
+            <mx:horizontalAxis>
+              <mx:LinearAxis labelFunction="byteFormat"/>
+            </mx:horizontalAxis>
+      
+            <mx:backgroundElements>
+              <mx:GridLines visible="false"/>
+              <ChartBackgroundFill>
+                <fill>
+                  <mx:SolidColor color="#151515"/>
+                </fill>
+              </ChartBackgroundFill>
+            </mx:backgroundElements>
+  
+            <mx:verticalAxisRenderer>
+              <CustomAxisRenderer tickPlacement="outside" tickLength="6"/>
+            </mx:verticalAxisRenderer>
+            <mx:secondVerticalAxisRenderer>
+              <CustomAxisRenderer showLabels="false" minorTickPlacement="none" tickPlacement="none"/>
+            </mx:secondVerticalAxisRenderer>
+      
+            <mx:horizontalAxisRenderer>
+              <CustomAxisRenderer/>
+            </mx:horizontalAxisRenderer>
+            <mx:secondHorizontalAxisRenderer>
+              <CustomAxisRenderer showLabels="false" minorTickPlacement="none" tickPlacement="none"/>
+            </mx:secondHorizontalAxisRenderer>
+    
+            <mx:series>
+              <mx:BarSeries xField="bandwidth" showDataEffect="{interpolate}" itemRenderer="BarItemRenderer" displayName="Data Bandwidth">
+                <mx:fill>
+                  <mx:LinearGradient angle="90">
+                    <mx:entries>
+                      <mx:Array>
+                        <mx:GradientEntry color="#44aa77" ratio="0" alpha="100"/>
+                        <mx:GradientEntry color="#339966" ratio="0.1" alpha="100"/>
+                        <mx:GradientEntry color="#246d49" ratio="0.9" alpha="100"/>
+                        <mx:GradientEntry color="#111111" ratio="1" alpha="100"/>
+                      </mx:Array>
+                    </mx:entries>
+                  </mx:LinearGradient>
+                </mx:fill>
+              </mx:BarSeries>
+            </mx:series>
+      
+          </mx:BarChart>
+          <mx:BarChart id="memoryChart" width="100%" height="100%" dataProvider="{displayResults}" showDataTips="true" fontSize="10" dataTipFunction="getMemoryDataTip">
+                    
+            <mx:verticalAxis>
+              <mx:CategoryAxis categoryField="name"/>
+            </mx:verticalAxis>
+  
+            <mx:horizontalAxis>
+              <mx:LinearAxis labelFunction="byteFormat"/>
+            </mx:horizontalAxis>
+      
+            <mx:backgroundElements>
+              <mx:GridLines visible="false"/>
+              <ChartBackgroundFill>
+                <fill>
+                  <mx:SolidColor color="#151515"/>
+                </fill>
+              </ChartBackgroundFill>
+            </mx:backgroundElements>
+  
+            <mx:verticalAxisRenderer>
+              <CustomAxisRenderer tickPlacement="outside" tickLength="6"/>
+            </mx:verticalAxisRenderer>
+            <mx:secondVerticalAxisRenderer>
+              <CustomAxisRenderer showLabels="false" minorTickPlacement="none" tickPlacement="none"/>
+            </mx:secondVerticalAxisRenderer>
+      
+            <mx:horizontalAxisRenderer>
+              <CustomAxisRenderer/>
+            </mx:horizontalAxisRenderer>
+            <mx:secondHorizontalAxisRenderer>
+              <CustomAxisRenderer showLabels="false" minorTickPlacement="none" tickPlacement="none"/>
+            </mx:secondHorizontalAxisRenderer>
+      
+            <mx:series>
+              <mx:BarSeries xField="memory" showDataEffect="{interpolate}" itemRenderer="BarItemRenderer" displayName="Total Client Memory (Only available with Flex)">
+                <mx:fill>
+                  <mx:LinearGradient angle="90">
+                    <mx:entries>
+                      <mx:Array>
+                        <mx:GradientEntry color="#dd0000" ratio="0" alpha="100"/>
+                        <mx:GradientEntry color="#990000" ratio="0.1" alpha="100"/>
+                        <mx:GradientEntry color="#6d0000" ratio="0.9" alpha="100"/>
+                        <mx:GradientEntry color="#111111" ratio="1" alpha="100"/>
+                      </mx:Array>
+                    </mx:entries>
+                  </mx:LinearGradient>
+                </mx:fill>
+              </mx:BarSeries>
+            </mx:series>
+          </mx:BarChart>
+        </mx:VBox>
+      </mx:Canvas>
+    </mx:VBox>
+    <mx:HBox id="leftShadow" height="100%" width="5" horizontalGap="0">
+      <mx:VRule height="100%" strokeColor="#2a2a2a" strokeWidth="1"/>
+      <mx:VRule height="100%" strokeColor="#111111" strokeWidth="1"/>
+      <mx:VRule height="100%" strokeColor="#111111" strokeWidth="1" alpha="0.6"/>
+      <mx:VRule height="100%" strokeColor="#111111" strokeWidth="1" alpha="0.3"/>
+      <mx:VRule height="100%" strokeColor="#111111" strokeWidth="1" alpha="0.15"/>
+    </mx:HBox>
+    <mx:Canvas width="22" height="100%" borderThickness="1" borderColor="#2b2b2b" borderStyle="solid" borderSides="top bottom" useHandCursor="true" buttonMode="true" mouseChildren="false">
+      <mx:click>
+      if (mainPanelHBox.x == 0)
+      {
+        // open the right panel
+        leftShadow.width = 5;
+        rightShadow.width = 5;
+        mainPanelHBox.x = (chartPanel.width * -1);
+      }
+      else
+      {
+        // close the right panel
+        iFrame.visible = false;
+        callLater(function():void {
+          leftShadow.width = 5;
+          rightShadow.width = 5;
+          mainPanelHBox.x = 0;
+        });
+      }
+      </mx:click>
+      <mx:Label x="17" y="5" rotation="90" htmlText="{getShelfText(shelfOpenText, shelfClosedText, mainPanelHBox.x)}" fontSize="10" useHandCursor="true"/>
+    </mx:Canvas>
+    <mx:HBox id="rightShadow" height="100%" width="0" horizontalGap="0">
+      <mx:VRule height="100%" strokeColor="#2a2a2a" strokeWidth="1"/>
+      <mx:VRule height="100%" strokeColor="#111111" strokeWidth="1"/>
+      <mx:VRule height="100%" strokeColor="#111111" strokeWidth="1" alpha="0.6"/>
+      <mx:VRule height="100%" strokeColor="#111111" strokeWidth="1" alpha="0.3"/>
+      <mx:VRule height="100%" strokeColor="#111111" strokeWidth="1" alpha="0.15"/>
+    </mx:HBox>
+    <mx:VBox width="100%" height="100%" horizontalAlign="left" verticalGap="0" paddingLeft="4" paddingRight="4" paddingBottom="4" borderThickness="1" borderColor="#2b2b2b" borderStyle="solid" borderSides="top bottom">
+      <mx:Spacer height="40"/>
+      <mx:HBox width="100%" paddingLeft="15" paddingRight="15">
+        <mx:HRule width="100%" strokeColor="#313131" strokeWidth="1"/>
+      </mx:HBox>
+      <mx:Spacer height="10"/>
+      <mx:Box width="100%" height="100%" paddingLeft="15" paddingRight="15" paddingBottom="15">
+        <IFrame id="iFrame" source="index_results.html" width="100%" height="100%"  />
+      </mx:Box>
+    </mx:VBox>
+    </mx:HBox>
+    </mx:Canvas>
+  </mx:HBox>
+
+</mx:Application>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (C) 2007 James Ward
+http://www.jamesward.org
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+-->
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
+  horizontalAlign="center"
+  backgroundColor="#1a1a1a"
+  backgroundGradientAlphas="[1.0, 1.0]"
+  backgroundGradientColors="[0x1a1a1a, 0x1a1a1a]"
+  paddingTop="0"
+  paddingBottom="0"
+  paddingLeft="0"
+  paddingRight="0"
+  usePreloader="false"
+  preinitialize="Font.registerFont(BaseRSL.myriadWebPro);Font.registerFont(BaseRSL.myriadWebProBold);"
+  creationComplete="initApp()"
+  frameRate="99">
+
+  <mx:Metadata>
+    [SWF(backgroundColor="0x1a1a1a")]
+  </mx:Metadata>
+
+  <mx:Style source="flex.css"/>
+
+  <mx:Script>
+  <![CDATA[
+
+  [Bindable]
+  public var rows:Number;
+
+  private var gzip:Boolean;
+  private var startTime:Number;
+  private var sendResult:Boolean = false;
+  private var conn:LocalConnection;
+  private var testResult:TestResult;
+
+  private function initApp():void
+  {
+    conn = new LocalConnection();
+    rows = new Number(parameters.rows);
+
+    gzip = new Boolean(parameters.gzip);
+
+    var params:Object = {command: "getXML", rows: rows};
+    if (gzip)
+    {
+      params.gzip = true;
+    }
+
+    testResult = new TestResult("flex_xml_as");
+    testResult.rows = rows;
+    startTime = (new Date()).time;
+    sendResult = true;
+    srv.send(params);
+    srv.channelSet.messageAgents[0].addEventListener('acknowledge',loadDone);
+  }
+      
+  private function done():void
+  {
+    if (sendResult)
+    {
+      var now:Number = new Date().time;
+      testResult.renderTime = (now - startTime);
+      testResult.memory = flash.system.System.totalMemory;
+      conn.send("census_lc", "testDone", testResult);
+    }
+    sendResult = false;
+  }
+
+  private function loadDone(event:Event):void
+  {
+    var now:Number = new Date().time;
+    testResult.transferTime = (now - startTime);
+    startTime = (new Date()).time;
+  }
+
+  private function parseDone(event:Event):void
+  {
+    var now:Number = new Date().time;
+    testResult.parseTime = (now - startTime);
+    startTime = (new Date()).time;
+  }
+  ]]>
+  </mx:Script>
+
+  <mx:HTTPService id="srv" url="servlet/CensusServiceServlet?id=flex_xml_as" resultFormat="object" result="parseDone(event)"/>
+
+  <mx:DataGrid dataProvider="{srv.lastResult.list.item}" width="100%" height="100%" updateComplete="done()">
+    <mx:columns>
+      <mx:DataGridColumn dataField="itemId"/>
+      <mx:DataGridColumn dataField="age"/>
+      <mx:DataGridColumn dataField="classOfWorker"/>
+      <mx:DataGridColumn dataField="education"/>
+      <mx:DataGridColumn dataField="maritalStatus"/>
+      <mx:DataGridColumn dataField="race"/>
+      <mx:DataGridColumn dataField="sex"/>
+    </mx:columns>
+  </mx:DataGrid>
+
+</mx:Application>
