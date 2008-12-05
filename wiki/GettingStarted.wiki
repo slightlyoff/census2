@@ -15,7 +15,7 @@ To get started from a release, download the latest release tarball from the Goog
 
 {{{
 %> cd parentDir
-%> wget code.google.com/p/census2/FIXME/census2.tar.gz
+%> wget http://census2.googlecode.com/files/census2_0.0.1_snapshot.tar.gz
 %> tar -zxvf census2.tar.gz
 ...
 %> cd census2
