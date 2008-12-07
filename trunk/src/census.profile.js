@@ -26,7 +26,7 @@ dependencies = {
 		{
 			name: "../dojox/embed/Flash.js",
 			dependencies: [
-				"dojo.embed.Flash"
+				"dojox.embed.Flash"
 			]
 		},
 		{
