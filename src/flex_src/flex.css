@@ -43,28 +43,12 @@ Button
   textRollOverColor: #dddddd;
   textSelectedColor: #dddddd;
   disabledColor: #282828;
-  disabledSkin: ClassReference("ButtonSkin");
-  downSkin: ClassReference("ButtonSkin");
-  overSkin: ClassReference("ButtonSkin");
-  selectedDisabledSkin: ClassReference("ButtonSkin");
-  selectedDownSkin: ClassReference("ButtonSkin");
-  selectedOverSkin: ClassReference("ButtonSkin");
-  selectedUpSkin: ClassReference("ButtonSkin");
-  upSkin: ClassReference("ButtonSkin");
 }
 
 CheckBox
 {
   textRollOverColor: #bbbbbb;
   textSelectedColor: #bbbbbb;
-  upIcon: ClassReference("CheckBoxIcon");
-  selectedUpIcon:ClassReference("CheckBoxIcon");
-  overIcon: ClassReference("CheckBoxIcon");
-  selectedOverIcon: ClassReference("CheckBoxIcon");
-  downIcon: ClassReference("CheckBoxIcon");
-  selectedDownIcon: ClassReference("CheckBoxIcon");
-  disabledIcon: ClassReference("CheckBoxIcon");
-  selectedDisabledIcon: ClassReference("CheckBoxIcon");
 }
 
 ScrollBar
@@ -75,17 +59,6 @@ ScrollBar
   fillColors: #292929, #131313;
   fillAlphas: 1,1;
   themeColor: #292929;
-  downArrowDisabledSkin: ClassReference("ScrollArrowSkin");
-  downArrowDownSkin: ClassReference("ScrollArrowSkin");
-  downArrowOverSkin: ClassReference("ScrollArrowSkin");
-  downArrowUpSkin: ClassReference("ScrollArrowSkin");
-  upArrowDisabledSkin: ClassReference("ScrollArrowSkin");
-  upArrowDownSkin: ClassReference("ScrollArrowSkin");
-  upArrowOverSkin: ClassReference("ScrollArrowSkin");
-  upArrowUpSkin: ClassReference("ScrollArrowSkin");
-  thumbDownSkin: ClassReference("ScrollThumbSkin");
-  thumbOverSkin: ClassReference("ScrollThumbSkin");
-  thumbUpSkin: ClassReference("ScrollThumbSkin");
 }
 
 Alert
@@ -133,15 +106,6 @@ NumericStepper
   focusAlpha: 0;
   focusThickness: 0;
   borderThickness: 2;
-  downArrowDisabledSkin: ClassReference("NumericStepperDownSkin");
-  downArrowDownSkin: ClassReference("NumericStepperDownSkin");
-  downArrowOverSkin: ClassReference("NumericStepperDownSkin");
-  downArrowUpSkin: ClassReference("NumericStepperDownSkin");
-  upArrowDisabledSkin: ClassReference("NumericStepperUpSkin");
-  upArrowDownSkin: ClassReference("NumericStepperUpSkin");
-  upArrowOverSkin: ClassReference("NumericStepperUpSkin");
-  upArrowUpSkin: ClassReference("NumericStepperUpSkin");
-  borderSkin: ClassReference("NumericStepperBorderSkin");
 }
 
 LegendItem
@@ -185,7 +149,6 @@ DataGrid
   alternatingItemColors: #161616, #161616;
   verticalGridLines: false;
   horizontalGridLines: false;
-  headerSeparatorSkin: ClassReference("DataGridHeaderSeparator");
   backgroundColor: #151515;
   rollOverColor: #363636;
   selectionColor: #363636;
@@ -200,16 +163,6 @@ TextInput
 {
   cornerRadius: 3;
   borderStyle: solid;
-}
-
-ComboBox
-{
-  cornerRadius: 3;
-  fontSize: 10;
-  fontWeight: bold;
-  downSkin: ClassReference("ComboBoxSkin");
-  overSkin: ClassReference("ComboBoxSkin");
-  upSkin: ClassReference("ComboBoxSkin");
 }
 
 .comboDropDown
