@@ -1,0 +1,223 @@
+/*
+Copyright (C) 2007 James Ward
+http://www.jamesward.org
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
+
+global
+{
+  fontFamily: myriadWebPro;
+  themeColor: #292929;
+  color: #bbbbbb;
+  leading: -1;
+}
+
+TextArea
+{
+  leading: 2;
+}
+
+Text
+{
+  leading: 2;
+}
+
+Button
+{
+  fontSize: 10;
+  fontWeight: bold;
+  fontFamily: myriadWebPro;
+  textRollOverColor: #dddddd;
+  textSelectedColor: #dddddd;
+  disabledColor: #282828;
+  disabledSkin: ClassReference("ButtonSkin");
+  downSkin: ClassReference("ButtonSkin");
+  overSkin: ClassReference("ButtonSkin");
+  selectedDisabledSkin: ClassReference("ButtonSkin");
+  selectedDownSkin: ClassReference("ButtonSkin");
+  selectedOverSkin: ClassReference("ButtonSkin");
+  selectedUpSkin: ClassReference("ButtonSkin");
+  upSkin: ClassReference("ButtonSkin");
+}
+
+CheckBox
+{
+  textRollOverColor: #bbbbbb;
+  textSelectedColor: #bbbbbb;
+  upIcon: ClassReference("CheckBoxIcon");
+  selectedUpIcon:ClassReference("CheckBoxIcon");
+  overIcon: ClassReference("CheckBoxIcon");
+  selectedOverIcon: ClassReference("CheckBoxIcon");
+  downIcon: ClassReference("CheckBoxIcon");
+  selectedDownIcon: ClassReference("CheckBoxIcon");
+  disabledIcon: ClassReference("CheckBoxIcon");
+  selectedDisabledIcon: ClassReference("CheckBoxIcon");
+}
+
+ScrollBar
+{
+  trackColors: #131313, #101010;
+  borderColor: #0e0e0e;
+  backgroundColor: #0e0e0e;
+  fillColors: #292929, #131313;
+  fillAlphas: 1,1;
+  themeColor: #292929;
+  downArrowDisabledSkin: ClassReference("ScrollArrowSkin");
+  downArrowDownSkin: ClassReference("ScrollArrowSkin");
+  downArrowOverSkin: ClassReference("ScrollArrowSkin");
+  downArrowUpSkin: ClassReference("ScrollArrowSkin");
+  upArrowDisabledSkin: ClassReference("ScrollArrowSkin");
+  upArrowDownSkin: ClassReference("ScrollArrowSkin");
+  upArrowOverSkin: ClassReference("ScrollArrowSkin");
+  upArrowUpSkin: ClassReference("ScrollArrowSkin");
+  thumbDownSkin: ClassReference("ScrollThumbSkin");
+  thumbOverSkin: ClassReference("ScrollThumbSkin");
+  thumbUpSkin: ClassReference("ScrollThumbSkin");
+}
+
+Alert
+{
+  backgroundColor: #393939;
+  borderColor: #393939;
+}
+
+.alertButtonStyle
+{
+  color: #bbbbbb;
+  textRollOverColor: #dddddd;
+  textSelectedColor: #dddddd;
+}
+
+TitleWindow
+{
+  backgroundColor: #393939;
+  borderColor: #393939;
+}
+
+ToolTip
+{
+  backgroundColor: #393939;
+}
+
+DataTip
+{
+  color: #bbbbbb;
+  paddingLeft: 4;
+  paddingRight: 4;
+  paddingBottom: 4;
+  backgroundColor: #393939;
+  fontSize: 12;
+}
+
+NumericStepper
+{
+  cornerRadius: 3;
+  backgroundColor: #151515;
+  borderColor: #111111;
+  disabledColor: #282828;
+  textRollOverColor: #dddddd;
+  textSelectedColor: #dddddd;
+  focusAlpha: 0;
+  focusThickness: 0;
+  borderThickness: 2;
+  downArrowDisabledSkin: ClassReference("NumericStepperDownSkin");
+  downArrowDownSkin: ClassReference("NumericStepperDownSkin");
+  downArrowOverSkin: ClassReference("NumericStepperDownSkin");
+  downArrowUpSkin: ClassReference("NumericStepperDownSkin");
+  upArrowDisabledSkin: ClassReference("NumericStepperUpSkin");
+  upArrowDownSkin: ClassReference("NumericStepperUpSkin");
+  upArrowOverSkin: ClassReference("NumericStepperUpSkin");
+  upArrowUpSkin: ClassReference("NumericStepperUpSkin");
+  borderSkin: ClassReference("NumericStepperBorderSkin");
+}
+
+LegendItem
+{
+  fontFamily: myriadWebPro;
+  fontWeight: bold;
+  fontSize: 10;
+}
+
+LinkBar
+{
+  color: #484848;
+  fontWeight: bold;
+  fontSize: 12;
+  separatorWidth: 0;
+  rollOverColor: #1a1a1a;
+  selectionColor: #1a1a1a;
+  textRollOverColor: #bbbbbb;
+  textSelectedColor: #bbbbbb;
+}
+
+LinkButton
+{
+  disabledColor: #bbbbbb;
+}
+
+List
+{
+  backgroundColor: #151515;
+  rollOverColor: #363636;
+  selectionColor: #363636;
+  borderColor: #111111;
+  textRollOverColor: #bbbbbb;
+  textSelectedColor: #bbbbbb;
+  themeColor: #292929;
+}
+
+DataGrid
+{
+  headerColors: #292929, #131313;
+  alternatingItemColors: #161616, #161616;
+  verticalGridLines: false;
+  horizontalGridLines: false;
+  headerSeparatorSkin: ClassReference("DataGridHeaderSeparator");
+  backgroundColor: #151515;
+  rollOverColor: #363636;
+  selectionColor: #363636;
+  borderColor: #111111;
+  textRollOverColor: #bbbbbb;
+  textSelectedColor: #bbbbbb;
+  themeColor: #292929;
+  iconColor: #cccccc;
+}
+
+TextInput
+{
+  cornerRadius: 3;
+  borderStyle: solid;
+}
+
+ComboBox
+{
+  cornerRadius: 3;
+  fontSize: 10;
+  fontWeight: bold;
+  downSkin: ClassReference("ComboBoxSkin");
+  overSkin: ClassReference("ComboBoxSkin");
+  upSkin: ClassReference("ComboBoxSkin");
+}
+
+.comboDropDown
+{
+  backgroundColor: #252525;
+  rollOverColor: #131313;
+  selectionColor: #131313;
+  textRollOverColor: #bbbbbb;
+  textSelectedColor: #bbbbbb;
+  themeColor: #252525;
+}
