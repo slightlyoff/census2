@@ -28,10 +28,10 @@ public class BaseRSL extends Sprite
   private var dataGrid:DataGrid;
   private var testResult:TestResult;
 
-  [Embed(source="Vera.ttf", fontFamily="myriadWebPro")]
+  [Embed(source="../c2/resources/Vera.ttf", fontFamily="myriadWebPro")]
   public static var myriadWebPro:Class;
 
-  [Embed(source="VeraBd.ttf", fontFamily="myriadWebPro", fontWeight="bold")]
+  [Embed(source="../c2/resources/VeraBold.ttf", fontFamily="myriadWebPro", fontWeight="bold")]
   public static var myriadWebProBold:Class;
 }
 }
