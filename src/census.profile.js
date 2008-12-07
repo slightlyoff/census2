@@ -24,6 +24,12 @@ dependencies = {
 		},
 		*/
 		{
+			name: "../dojox/embed/Flash.js",
+			dependencies: [
+				"dojo.embed.Flash"
+			]
+		},
+		{
 			name: "../dojo/cookie.js",
 			dependencies: [
 				"dojo.cookie"
