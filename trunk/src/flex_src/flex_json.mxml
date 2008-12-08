@@ -18,93 +18,72 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 -->
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
-  backgroundColor="#FFFFFF"
-  horizontalAlign="center"
-  styleName="plain"
-  creationComplete="initApp()"
-  frameRate="99">
+	backgroundColor="#FFFFFF"
+	horizontalAlign="center"
+	styleName="plain"
+	creationComplete="initApp()"
+	frameRate="99">
 
-  <mx:Script>
-  <![CDATA[
-  import com.adobe.serialization.json.JSON;
+	<mx:Script>
+	<![CDATA[
+		import mx.collections.*;
+		import com.adobe.serialization.json.JSON;
 
-  [Bindable]
-  public var rows:Number;
+		[Bindable]
+		public var rows:Number;
 
-  private var gzip:Boolean;
-  private var startTime:Number;
-  private var sendResult:Boolean = false;
-  private var conn:LocalConnection;
-  private var testResult:TestResult;
+		[Bindable]
+		public var gridData:ArrayCollection;
 
-  private function initApp():void
-  {
-    conn = new LocalConnection();
-    rows = new Number(parameters.rows);
+		private var started:Boolean;
 
-    gzip = new Boolean(parameters.gzip);
+		private function initApp():void {
+			rows = new Number(parameters.rows);
+			ExternalInterface.call("timing.tic", "transferTime");
+			srv.send({output: "json", rows: rows});
+			srv.channelSet.messageAgents[0].addEventListener('acknowledge', loadDone);
+			started = true;
+		}
 
-    if (gzip)
-    {
-      srv.url += "&gzip=true";
-    }
+		private function loadDone(event:Event):void {
+			ExternalInterface.call("timing.toc", "transferTime");
+			ExternalInterface.call("timing.tic", "renderTime");
+		}
 
-    testResult = new TestResult("flex_json");
-    testResult.rows = rows;
+		private function done():void {
+			if( started ) {
+				ExternalInterface.call("timing.toc", "renderTime");
+				ExternalInterface.call("timing.report");
+				started = false;
+			}
+		}
 
-    startTime = (new Date()).time;
-    srv.send({command: "getJSON", rows: rows});
-    srv.channelSet.messageAgents[0].addEventListener('acknowledge',loadDone);
-  }
-      
-  private function done():void
-  {
-    if (sendResult)
-    {
-      var now:Number = new Date().time;
-      testResult.renderTime = (now - startTime);
-      testResult.memory = flash.system.System.totalMemory;
-      conn.send("census_lc", "testDone", testResult);
-    }
-    sendResult = false;
-  }
+		private function handleResult():void {
+			var s:String = srv.lastResult.toString();
+			s = s.replace(/\n/g, "");
+			s = s.replace(/\r/g, "");
+			ExternalInterface.call("timing.tic", "parseTime");
+			var decoded:ArrayCollection = new ArrayCollection(JSON.decode(s));
+			ExternalInterface.call("timing.toc", "parseTime");
+			ExternalInterface.call("timing.tic", "renderTime");
+			gridData = decoded;
+		}
+	]]>
+	</mx:Script>
 
-  private function loadDone(event:Event):void
-  {
-    var now:Number = new Date().time;
-    testResult.transferTime = (now - startTime);
-    startTime = (new Date()).time;
-  }
+	<mx:HTTPService id="srv" url="data.jsp" resultFormat="text" result="handleResult()"/>
 
-  private function handleResult():void
-  {
-    var s:String = srv.lastResult.toString();
-    s = s.replace(/\n/g, "");
-    s = s.replace(/\r/g, "");
-    sendResult = true;
-    var decoded:Object = JSON.decode(s);
-    g.dataProvider = decoded.items;
-    var now:Number = new Date().time;
-    testResult.renderTime = (now - startTime);
-    startTime = (new Date()).time;
-  }
-  ]]>
-  </mx:Script>
-
-  <mx:HTTPService id="srv" url="servlet/CensusServiceServlet?id=flex_json" resultFormat="text" result="handleResult()"/>
-
-  <mx:DataGrid id="g" width="100%" height="100%" updateComplete="done()"/>
-    <!--
-    <mx:columns>
-      <mx:DataGridColumn dataField="itemId"/>
-      <mx:DataGridColumn dataField="age"/>
-      <mx:DataGridColumn dataField="classOfWorker"/>
-      <mx:DataGridColumn dataField="education"/>
-      <mx:DataGridColumn dataField="maritalStatus"/>
-      <mx:DataGridColumn dataField="race"/>
-      <mx:DataGridColumn dataField="sex"/>
-    </mx:columns>
-  </mx:DataGrid>
-  -->
-
+	<mx:DataGrid id="g" width="100%" height="100%" 
+		dataProvider="{gridData}"
+		updateComplete="done()">
+		<mx:columns>
+			<mx:DataGridColumn dataField="id" />
+			<mx:DataGridColumn dataField="age" />
+			<mx:DataGridColumn dataField="class" />
+			<mx:DataGridColumn dataField="education" />
+			<mx:DataGridColumn dataField="maritalStatus" />
+			<mx:DataGridColumn dataField="race" />
+			<mx:DataGridColumn dataField="sex" />
+		</mx:columns>
+	</mx:DataGrid>
 </mx:Application>
