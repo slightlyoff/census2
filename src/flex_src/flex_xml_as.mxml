@@ -24,11 +24,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	backgroundColor="#FFFFFF"
 	horizontalAlign="center"
 	styleName="plain"
-	creationComplete="initApp()"
+	applicationComplete="initApp()"
 	frameRate="99">
 
 	<mx:Script>
 	<![CDATA[
+		// FIXME: missing server time!
+
 		[Bindable]
 		public var rows:Number;
 
@@ -38,15 +40,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			rows = new Number(parameters.rows);
 
 			var params:Object = { output: "xml", count: rows };
+
 			ExternalInterface.call("timing.tic", "transferTime");
 			srv.send(params);
-			srv.channelSet.messageAgents[0].addEventListener('acknowledge', loadDone);
 			started = true;
+			srv.channelSet.messageAgents[0].addEventListener('acknowledge', loadDone);
 		}
 
 		private function loadDone(event:Event):void {
 			ExternalInterface.call("timing.toc", "transferTime");
-			// ExternalInterface.call("timing.tic", "parseTime");
+			ExternalInterface.call("timing.tic", "parseTime");
 		}
 
 		private function done():void {
@@ -58,12 +61,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		}
 
 		private function parseDone(event:Event):void {
-			// ExternalInterface.call("timing.toc", "parseTime");
+			ExternalInterface.call("timing.toc", "parseTime");
+			ExternalInterface.call("timing.tic", "renderTime");
 		}
 	]]>
 	</mx:Script>
 
-	<mx:HTTPService id="srv" url="data.jsp" resultFormat="object" result="parseDone(event)"/>
+	<mx:HTTPService 
+		id="srv" url="data.jsp" 
+		resultFormat="object" 
+		result="parseDone(event)" />
 
 	<mx:DataGrid 
 		id="g"

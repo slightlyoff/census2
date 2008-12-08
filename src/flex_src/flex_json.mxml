@@ -24,11 +24,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	backgroundColor="#FFFFFF"
 	horizontalAlign="center"
 	styleName="plain"
-	creationComplete="initApp()"
+	applicationComplete="initApp()"
 	frameRate="99">
 
 	<mx:Script>
 	<![CDATA[
+		// FIXME: missing server time!
+
 		import mx.collections.*;
 		import com.adobe.serialization.json.JSON;
 
