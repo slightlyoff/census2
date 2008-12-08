@@ -47,8 +47,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 					"grid"
 				);
 				dojo.connect(movie, "onLoad", function(){
-					if(!movie.movie.IsPlaying()){
-						movie.movie.Play();
+					var mm = movie.movie;
+					if(mm.IsPlaying && !mm.IsPlaying() && !dojo.isSafari){
+						mm.Play();
 					}
 				});
 			});
