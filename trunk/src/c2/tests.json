@@ -44,7 +44,7 @@
 	},
 	{
 		"name": "Flex: JSON",
-		"desc": "JSON to ActionScript",
+		"desc": "JSON to ActionScript objects",
 		"file": "flex_json.html",
 		"longDescUrl": "descriptions/intro.html"
 	},
@@ -69,11 +69,10 @@
 		"longDescUrl": "descriptions/intro.html"
 	},
 	{
-		"disabled": true,
 		"name": "Flex: XML E4X",
 		"desc": "XML to E4X objects",
 		"file": "flex_xml_e4x.html",
-		"longDescUrl": ""
+		"longDescUrl": "descriptions/intro.html"
 	},
 	{
 		"disabled": true,
