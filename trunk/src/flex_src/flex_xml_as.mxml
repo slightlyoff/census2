@@ -3,6 +3,9 @@
 Copyright (C) 2007 James Ward
 http://www.jamesward.org
 
+Updated, Alex Russell, 2008
+http://alex.dojotoolkit.org
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -18,28 +21,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 -->
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
+	backgroundColor="#FFFFFF"
 	horizontalAlign="center"
-	backgroundColor="#1a1a1a"
-	backgroundGradientAlphas="[1.0, 1.0]"
-	backgroundGradientColors="[0x1a1a1a, 0x1a1a1a]"
-	paddingTop="0"
-	paddingBottom="0"
-	paddingLeft="0"
-	paddingRight="0"
-	usePreloader="false"
-	preinitialize="Font.registerFont(BaseRSL.myriadWebPro);Font.registerFont(BaseRSL.myriadWebProBold);"
+	styleName="plain"
 	creationComplete="initApp()"
 	frameRate="99">
 
-	<mx:Metadata>
-		[SWF(backgroundColor="0x1a1a1a")]
-	</mx:Metadata>
-
-	<mx:Style source="flex.css"/>
-
 	<mx:Script>
 	<![CDATA[
-
 		[Bindable]
 		public var rows:Number;
 
@@ -57,7 +46,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 		private function loadDone(event:Event):void {
 			ExternalInterface.call("timing.toc", "transferTime");
-			ExternalInterface.call("timing.tic", "parseTime");
+			// ExternalInterface.call("timing.tic", "parseTime");
 		}
 
 		private function done():void {
@@ -69,15 +58,18 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		}
 
 		private function parseDone(event:Event):void {
-			ExternalInterface.call("timing.toc", "parseTime");
+			// ExternalInterface.call("timing.toc", "parseTime");
 		}
 	]]>
 	</mx:Script>
 
 	<mx:HTTPService id="srv" url="data.jsp" resultFormat="object" result="parseDone(event)"/>
 
-	<mx:DataGrid dataProvider="{srv.lastResult.list.item}" 
-		width="100%" height="100%" updateComplete="done()">
+	<mx:DataGrid 
+		id="g"
+		dataProvider="{srv.lastResult.list.item}" 
+		width="100%" height="100%" 
+		updateComplete="done()">
 		<mx:columns>
 			<mx:DataGridColumn dataField="itemId" />
 			<mx:DataGridColumn dataField="age" />
@@ -88,5 +80,4 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			<mx:DataGridColumn dataField="sex" />
 		</mx:columns>
 	</mx:DataGrid>
-
 </mx:Application>

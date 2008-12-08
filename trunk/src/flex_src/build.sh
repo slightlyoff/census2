@@ -52,6 +52,7 @@ function compileMxml {
 		echo "ERROR: No Flex SDK found! Plese re-run get_deps.sh from the root project directory"
 		exit
 	fi
+	#	-debug=true \
 	java -Dapplication.home=$FLEX_SDK_DIR -jar $FLEX_SDK_DIR/lib/mxmlc.jar \
 		-library-path+=as3corelib.swc \
 		-compiler.context-root ../src \
