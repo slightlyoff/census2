@@ -16,7 +16,9 @@
 		start = Integer.parseInt(request.getParameter("start"));
 	}
 	Integer count = 5000;
-	if(null != request.getParameter("count")){
+	if(null != request.getParameter("rows")){
+		count = Integer.parseInt(request.getParameter("rows"));
+	}else if(null != request.getParameter("count")){
 		count = Integer.parseInt(request.getParameter("count"));
 	}
 

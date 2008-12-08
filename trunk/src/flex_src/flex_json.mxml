@@ -40,7 +40,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		private function initApp():void {
 			rows = new Number(parameters.rows);
 			ExternalInterface.call("timing.tic", "transferTime");
-			srv.send({output: "json", rows: rows});
+			srv.send({output: "json", count: rows});
 			srv.channelSet.messageAgents[0].addEventListener('acknowledge', loadDone);
 			started = true;
 		}

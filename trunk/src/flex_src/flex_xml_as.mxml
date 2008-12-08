@@ -43,28 +43,29 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		[Bindable]
 		public var rows:Number;
 
-		private var gzip:Boolean;
+		private var started:Boolean;
 
 		private function initApp():void {
 			rows = new Number(parameters.rows);
 
-			gzip = new Boolean(parameters.gzip);
-			var params:Object = { output: "json", rows: rows };
-			if (gzip) {
-				params.gzip = true;
-			}
-
+			var params:Object = { output: "xml", count: rows };
 			ExternalInterface.call("timing.tic", "transferTime");
 			srv.send(params);
-			srv.channelSet.messageAgents[0].addEventListener('acknowledge',loadDone);
-		}
-
-		private function done():void {
+			srv.channelSet.messageAgents[0].addEventListener('acknowledge', loadDone);
+			started = true;
 		}
 
 		private function loadDone(event:Event):void {
 			ExternalInterface.call("timing.toc", "transferTime");
 			ExternalInterface.call("timing.tic", "parseTime");
+		}
+
+		private function done():void {
+			if( started ) {
+				ExternalInterface.call("timing.toc", "renderTime");
+				ExternalInterface.call("timing.report");
+				started = false;
+			}
 		}
 
 		private function parseDone(event:Event):void {

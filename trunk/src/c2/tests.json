@@ -63,11 +63,10 @@
 		"longDescUrl": ""
 	},
 	{
-		"disabled": true,
 		"name": "Flex: XML AS",
 		"desc": "XML to ActionScript objects",
 		"file": "flex_xml_as.html",
-		"longDescUrl": ""
+		"longDescUrl": "descriptions/intro.html"
 	},
 	{
 		"disabled": true,
