@@ -36,6 +36,8 @@
 		},
 		size: function(name, value){
 			if(dojo.isString(value) || dojo.isArrayLike(value)){
+				// we're assuming single-byte words...won't work in other
+				// localles or non-UTF-8 encodings
 				value = value.length;
 			}
 			this._sizes[name] = value;
