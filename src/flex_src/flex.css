@@ -19,7 +19,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 global
 {
-  fontFamily: myriadWebPro;
   themeColor: #292929;
   color: #bbbbbb;
   leading: -1;
@@ -39,7 +38,6 @@ Button
 {
   fontSize: 10;
   fontWeight: bold;
-  fontFamily: myriadWebPro;
   textRollOverColor: #dddddd;
   textSelectedColor: #dddddd;
   disabledColor: #282828;
@@ -110,7 +108,6 @@ NumericStepper
 
 LegendItem
 {
-  fontFamily: myriadWebPro;
   fontWeight: bold;
   fontSize: 10;
 }
