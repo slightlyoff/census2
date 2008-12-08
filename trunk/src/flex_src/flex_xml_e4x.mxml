@@ -3,6 +3,9 @@
 Copyright (C) 2007 James Ward
 http://www.jamesward.org
 
+Updated, Alex Russell, 2008
+http://alex.dojotoolkit.org
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -17,99 +20,71 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 -->
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
-  horizontalAlign="center"
-  backgroundColor="#1a1a1a"
-  backgroundGradientAlphas="[1.0, 1.0]"
-  backgroundGradientColors="[0x1a1a1a, 0x1a1a1a]"
-  paddingTop="0"
-  paddingBottom="0"
-  paddingLeft="0"
-  paddingRight="0"
-  usePreloader="false"
-  preinitialize="Font.registerFont(BaseRSL.myriadWebPro);Font.registerFont(BaseRSL.myriadWebProBold);"
-  creationComplete="initApp()"
-  frameRate="99">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
+	backgroundColor="#FFFFFF"
+	horizontalAlign="center"
+	styleName="plain"
+	applicationComplete="initApp()"
+	frameRate="99">
 
-  <mx:Metadata>
-    [SWF(backgroundColor="0x1a1a1a")]
-  </mx:Metadata>
+	<mx:Script>
+	<![CDATA[
+		// FIXME: missing server time!
 
-  <mx:Style source="flex.css"/>
+		[Bindable]
+		public var rows:Number;
 
-  <mx:Script>
-  <![CDATA[
+		private var started:Boolean;
 
-  [Bindable]
-  public var rows:Number;
+		private function initApp():void {
+			rows = new Number(parameters.rows);
 
-  private var gzip:Boolean;
-  private var startTime:Number;
-  private var sendResult:Boolean = false;
-  private var conn:LocalConnection;
-  private var testResult:TestResult;
+			var params:Object = { output: "xml", count: rows };
 
-  private function initApp():void
-  {
-    conn = new LocalConnection();
-    rows = new Number(parameters.rows);
+			ExternalInterface.call("timing.tic", "transferTime");
+			srv.send(params);
+			started = true;
+			srv.channelSet.messageAgents[0].addEventListener('acknowledge', loadDone);
+		}
 
-    gzip = new Boolean(parameters.gzip);
+		private function done():void {
+			if( started ) {
+				ExternalInterface.call("timing.toc", "renderTime");
+				ExternalInterface.call("timing.report");
+				started = false;
+			}
+		}
 
-    var params = {command: "getXML", rows: rows};
-    if (gzip)
-    {
-      params.gzip = true;
-    }
+		private function loadDone(event:Event):void {
+			ExternalInterface.call("timing.toc", "transferTime");
+			ExternalInterface.call("timing.tic", "parseTime");
+		}
 
-    testResult = new TestResult("flex_xml_e4x");
-    testResult.rows = rows;
-    startTime = (new Date()).time;
-    sendResult = true;
-    srv.send(params);
-    srv.channelSet.messageAgents[0].addEventListener('acknowledge',loadDone);
-  }
+		private function parseDone(event:Event):void {
+			ExternalInterface.call("timing.toc", "parseTime");
+			ExternalInterface.call("timing.tic", "renderTime");
+		}
+	]]>
+	</mx:Script>
 
-  private function done():void
-  {
-    if (sendResult)
-    {
-      var now:Number = new Date().time;
-      testResult.renderTime = (now - startTime);
-      testResult.memory = flash.system.System.totalMemory;
-      conn.send("census_lc", "testDone", testResult);
-    }
-    sendResult = false;
-  }
+	<mx:HTTPService 
+		id="srv" url="data.jsp" 
+		resultFormat="e4x" 
+		result="parseDone(event)" />
 
-  private function loadDone(event:Event):void
-  {
-    var now:Number = new Date().time;
-    testResult.transferTime = (now - startTime);
-    startTime = (new Date()).time;
-  }
-      
-  private function parseDone(event:Event):void
-  {
-    var now:Number = new Date().time;
-    testResult.parseTime = (now - startTime);
-    startTime = (new Date()).time;
-  }
-  ]]>
-  </mx:Script>
-
-  <mx:HTTPService id="srv" url="servlet/CensusServiceServlet?id=flex_xml_e4x" resultFormat="e4x" result="parseDone(event)"/>
-
-  <mx:DataGrid dataProvider="{srv.lastResult.item}" width="100%" height="100%" updateComplete="done()">
-    <mx:columns>
-      <mx:DataGridColumn dataField="itemId" sortable="true"/>
-      <mx:DataGridColumn dataField="age" sortable="true"/>
-      <mx:DataGridColumn dataField="classOfWorker" sortable="true"/>
-      <mx:DataGridColumn dataField="education" sortable="true"/>
-      <mx:DataGridColumn dataField="maritalStatus" sortable="true"/>
-      <mx:DataGridColumn dataField="race" sortable="true"/>
-      <mx:DataGridColumn dataField="sex" sortable="true"/>
-    </mx:columns>
-  </mx:DataGrid>
-  
+	<mx:DataGrid 
+		id="g"
+		dataProvider="{srv.lastResult.item}" 
+		width="100%" height="100%" 
+		updateComplete="done()">
+		<mx:columns>
+			<mx:DataGridColumn dataField="itemId" />
+			<mx:DataGridColumn dataField="age" />
+			<mx:DataGridColumn dataField="classOfWorker" />
+			<mx:DataGridColumn dataField="education" />
+			<mx:DataGridColumn dataField="maritalStatus" />
+			<mx:DataGridColumn dataField="race" />
+			<mx:DataGridColumn dataField="sex" />
+		</mx:columns>
+	</mx:DataGrid>
 </mx:Application>
