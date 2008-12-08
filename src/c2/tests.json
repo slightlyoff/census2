@@ -43,6 +43,12 @@
 		"longDescUrl": "descriptions/dojo_QueryReadStore.html"
 	},
 	{
+		"name": "Flex: JSON",
+		"desc": "JSON to ActionScript",
+		"file": "flex_json.html",
+		"longDescUrl": "descriptions/intro.html"
+	},
+	{
 		"disabled": true,
 		"name": "Flex: SOAP AS",
 		"desc": "SOAP to ActionScript objects",

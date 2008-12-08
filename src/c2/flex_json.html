@@ -29,6 +29,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		<script type="text/javascript">
 			dojo.require("dojo.cookie");
 			dojo.require("dojox.embed.Flash");
+
 			dojo.addOnLoad(function(){
 				var url = new dojo._Url(window.location);
 				var rows = 5000;
@@ -36,13 +37,24 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 					rows = dojo.queryToObject(url.query).rows||rows;
 				}
 				var movie = new dojox.embed.Flash({
+						width: "100%",
+						height: "100%",
+						vars: {
+							rows: rows
+						},
 						path: "./resources/flex/flex_json.swf"
 					},
 					"grid"
 				);
-				timing.tic("transferTime");
-				timing.toc("transferTime");
-				timing.report();
+				// FIXME: need to set up ExternalInterface hook points for timing communication
+				dojo.connect(movie, "onLoad", movie, function(){
+					// set up ExternalInterface call points
+					// dojox.embed.Flash.proxy(this, [ "setMessage", "getMessage" ]);
+				});
+
+				// timing.tic("transferTime");
+				// timing.toc("transferTime");
+				// timing.report();
 			});
 		</script>
 	</head>

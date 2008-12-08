@@ -61,7 +61,7 @@ function compileMxml {
 
 compileMxml "flex_json.mxml" "../c2/resources/flex/flex_json.swf"
 compileMxml "flex_xml_as.mxml" "../c2/resources/flex/flex_xml_as.swf"
-compileMxml "flex_xml_e4x.mxml" "../c2/resources/flex/flex_xml_e4x.swf"
+# compileMxml "flex_xml_e4x.mxml" "../c2/resources/flex/flex_xml_e4x.swf"
 
 #
 #   <compileflex src="${src.flex.dir}/flex_xml_as.mxml" dest="build/census.war/flex_xml_as.swf" app="census"/>
