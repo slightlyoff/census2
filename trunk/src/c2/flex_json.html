@@ -46,15 +46,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 					},
 					"grid"
 				);
-				// FIXME: need to set up ExternalInterface hook points for timing communication
-				dojo.connect(movie, "onLoad", movie, function(){
-					// set up ExternalInterface call points
-					// dojox.embed.Flash.proxy(this, [ "setMessage", "getMessage" ]);
+				dojo.connect(movie, "onLoad", function(){
+					if(!movie.movie.IsPlaying()){
+						movie.movie.Play();
+					}
 				});
-
-				// timing.tic("transferTime");
-				// timing.toc("transferTime");
-				// timing.report();
 			});
 		</script>
 	</head>

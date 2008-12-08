@@ -43,7 +43,6 @@
 		"longDescUrl": "descriptions/dojo_QueryReadStore.html"
 	},
 	{
-		"disabled": true,
 		"name": "Flex: JSON",
 		"desc": "JSON to ActionScript",
 		"file": "flex_json.html",
@@ -64,7 +63,6 @@
 		"longDescUrl": ""
 	},
 	{
-		"disabled": true,
 		"name": "Flex: XML AS",
 		"desc": "XML to ActionScript objects",
 		"file": "flex_xml_as.html",
