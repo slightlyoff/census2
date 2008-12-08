@@ -631,7 +631,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 						});
 					});
 					// when it changes, run the next test and show different summary data
-					$("#testListDropDown").connect("onchange", function(){
+					$("#testListDropDown").connect("onchange", this, function(){
 						// console.dir(this);
 						if(this.value == "default"){
 							this.setDefaults();
