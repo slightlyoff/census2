@@ -62,6 +62,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 		private function parseDone(event:Event):void {
 			ExternalInterface.call("timing.toc", "parseTime");
+			var s:String = srv.lastResult.toString();
+			ExternalInterface.call("timing.size", "bandwidth", s.length);
 			ExternalInterface.call("timing.tic", "renderTime");
 		}
 	]]>
