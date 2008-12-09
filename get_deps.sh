@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DOJO_VERSION=1.2.2
+DOJO_VERSION=1.2.3
 FLEX_VERSION=3.1.0.2710
 FLEX_SDK_NAME="flex_sdk_"$FLEX_VERSION"_mpl.zip"
 FLEX_OUT_DIR=`pwd`/src/c2/rsources/flex
@@ -62,7 +62,7 @@ then
 	rm -rf dojo_src/dojox/lang
 	cp -r dojo_patches/charting dojo_src/dojox/	
 	cp -r dojo_patches/lang dojo_src/dojox/	
-	cp -r dojo_patches/embed/* dojo_src/dojox/embed/
+	cp dojo_patches/embed/Flash.js dojo_src/dojox/embed/Flash.js
 	echo "	...done"		
 
 	echo "	creating Dojo build against custom layer"
