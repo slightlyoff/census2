@@ -5,3 +5,5 @@
 # (cd srv/jetty && java -jar start.jar)
 
 java -server -jar srv/jetty-runner-7.0.0.pre5.jar $@ src/c2
+
+#vim:noet:ts=4:sw=4:

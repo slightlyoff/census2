@@ -3,6 +3,7 @@
 DOJO_VERSION=1.2.2
 FLEX_VERSION=3.1.0.2710
 FLEX_SDK_NAME="flex_sdk_"$FLEX_VERSION"_mpl.zip"
+FLEX_OUT_DIR=`pwd`/src/c2/rsources/flex
 
 # export _JAVA_OPTIONS="-Xms512m -Xmx1g"
 
@@ -16,7 +17,6 @@ function getFile {
 		fi
 	fi
 }
-
 
 echo "setting up dependencies"
 
@@ -34,6 +34,14 @@ then
 	cd ..
 fi
 
+if [[ ! -d $FLEX_OUT_DIR ]]
+then
+	mkdir -p $FLEX_OUT_DIR
+	LWD=`pwd`
+	cd src/flex_src
+	./build.sh
+	cd $LWD
+fi
 
 if [[ ! -d src/c2/dojo ]]
 then
@@ -80,3 +88,5 @@ then
 fi
 
 echo "done!"
+
+#vim:noet:ts=4:sw=4:

@@ -11,3 +11,5 @@ fi
 ./get_deps.sh
 
 echo "done!"
+
+#vim:noet:ts=4:sw=4:
