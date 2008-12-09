@@ -1,0 +1,8 @@
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SOAP-ENV:Body>
+    <tns1:getElements xmlns:tns1="http://census.jamesward.org">
+      <tns1:in0>0</tns1:in0>
+      <tns1:in1>5000</tns1:in1>
+    </tns1:getElements>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
