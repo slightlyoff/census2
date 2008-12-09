@@ -3,6 +3,9 @@
 Copyright (C) 2007 James Ward
 http://www.jamesward.org
 
+Updated, Alex Russell, 2008
+http://alex.dojotoolkit.org
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -17,109 +20,75 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 -->
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
-  backgroundColor="#1a1a1a"
-  backgroundGradientAlphas="[1.0, 1.0]"
-  backgroundGradientColors="[0x1a1a1a, 0x1a1a1a]"
-  paddingTop="0"
-  paddingBottom="0"
-  paddingLeft="0"
-  paddingRight="0"
-  usePreloader="false"
-  preinitialize="Font.registerFont(BaseRSL.myriadWebPro);Font.registerFont(BaseRSL.myriadWebProBold);"
-  creationComplete="initApp()"
-  frameRate="99">
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
+	backgroundColor="#FFFFFF"
+	horizontalAlign="center"
+	styleName="plain"
+	applicationComplete="initApp()"
+	frameRate="99">
 
-  <mx:Metadata>
-    [SWF(backgroundColor="0x1a1a1a")]
-  </mx:Metadata>
+	<mx:Script>
+	<![CDATA[
+		import mx.core.mx_internal;
 
-  <mx:Style source="flex.css"/>
+		use namespace mx_internal;
 
-  <mx:Script>
-  <![CDATA[
-  import mx.core.mx_internal;
+		[Bindable]
+		public var rows:int;
 
-  use namespace mx_internal;
-      
-  [Bindable]
-  public var rows:int;
+		private var sendResult:Boolean = false;
 
-  private var gzip:Boolean;
-  private var startTime:Number;
-  private var sendResult:Boolean = false;
-  private var conn:LocalConnection;
-  private var testResult:TestResult;
-      
-  private function initApp():void
-  {
-    conn = new LocalConnection();
-    rows = new Number(parameters.rows);
-    gzip = new Boolean(parameters.gzip);
+		private function initApp():void {
+			rows = new Number(parameters.rows);
 
-    var url:String  = "webservices/CensusService?id=flex_soap_as";
+			var url:String  = "data.jsp?id=flex_soap_as";
 
-    if (gzip)
-    {
-      url += "&gzip=true";
-    }
+			srv.endpointURI = url;
 
-    srv.endpointURI = url;
+			sendResult = true;
+			srv.getElements.send(0,rows);
+		}
 
-    testResult = new TestResult("flex_soap_as");
-    testResult.rows = rows;
-    startTime = (new Date()).time;
-    sendResult = true;
-    srv.getElements.send(0,rows);
-  }
-      
-  private function done():void
-  {
-    if (sendResult)
-    {
-      var now:Number = new Date().time;
-      testResult.renderTime = (now - startTime);
-      testResult.memory = flash.system.System.totalMemory;
-      conn.send("census_lc", "testDone", testResult);
-    }
-    sendResult = false;
-  }
+		private function done():void {
+			// render complete
+			// testResult.memory = flash.system.System.totalMemory;
+		}
 
-  private function loadComplete(event:Event):void
-  {
-    var now:Number = new Date().time;
-    testResult.transferTime = (now - startTime);
-    startTime = (new Date()).time;
-  }
+		private function loadComplete(event:Event):void {
+			// end of transfer
+			// start of parse
+		}
 
-  private function handleLoad():void
-  {
-    srv.getElements.asyncRequest.addEventListener('acknowledge',loadComplete);
-  }
+		private function handleLoad():void {
+			srv.getElements.asyncRequest.addEventListener('acknowledge',loadComplete);
+		}
 
-  private function parseDone():void
-  {
-    var now:Number = new Date().time;
-    testResult.parseTime = (now - startTime);
-    startTime = (new Date()).time;
-  }
-  ]]>
-  </mx:Script>
+		private function parseDone():void {
+			// end of parse
+			// start of render
+		}
+	]]>
+	</mx:Script>
 
-  <mx:WebService id="srv" wsdl="webservices/CensusService?wsdl" load="handleLoad()" result="parseDone()">
-    <mx:operation name="getElements"/>
-  </mx:WebService>
-  
-  <mx:DataGrid dataProvider="{srv.getElements.lastResult}" width="100%" height="100%" updateComplete="done()">
-    <mx:columns>
-      <mx:DataGridColumn dataField="id"/>
-      <mx:DataGridColumn dataField="age"/>
-      <mx:DataGridColumn dataField="classOfWorker"/>
-      <mx:DataGridColumn dataField="education"/>
-      <mx:DataGridColumn dataField="maritalStatus"/>
-      <mx:DataGridColumn dataField="race"/>
-      <mx:DataGridColumn dataField="sex"/>
-    </mx:columns>
-  </mx:DataGrid>
-  
+	<mx:WebService id="srv" wsdl="webservices/CensusService?wsdl" 
+		load="handleLoad()" result="parseDone()">
+		<mx:operation name="getElements"/>
+	</mx:WebService>
+
+	<mx:DataGrid 
+		id="g"
+		dataProvider="{srv.getElements.lastResult}" 
+		width="100%" height="100%" 
+		updateComplete="done()">
+		<mx:columns>
+			<mx:DataGridColumn dataField="itemId" />
+			<mx:DataGridColumn dataField="age"/>
+			<mx:DataGridColumn dataField="classOfWorker"/>
+			<mx:DataGridColumn dataField="education"/>
+			<mx:DataGridColumn dataField="maritalStatus"/>
+			<mx:DataGridColumn dataField="race"/>
+			<mx:DataGridColumn dataField="sex"/>
+		</mx:columns>
+	</mx:DataGrid>
+
 </mx:Application>
