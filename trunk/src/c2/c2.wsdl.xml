@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions 
+	targetNamespace="http://www.jamesward.org/census/services/CensusService" 
+	xmlns:apachesoap="http://xml.apache.org/xml-soap" 
+	xmlns:impl="http://www.jamesward.org/census/services/CensusService" 
+	xmlns:intf="http://www.jamesward.org/census/services/CensusService" 
+	xmlns:tns1="http://census.jamesward.org" 
+	xmlns:tns2="org.jamesward.census" 
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+	xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+	<wsdl:types>
+		<schema elementFormDefault="qualified" targetNamespace="http://census.jamesward.org" 
+			xmlns="http://www.w3.org/2001/XMLSchema">
+			<import namespace="org.jamesward.census"/>
+			<element name="getElements">
+				<complexType>
+					<sequence>
+						<element name="in0" type="xsd:int"/>
+						<element name="in1" type="xsd:int"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="getElementsResponse">
+				<complexType>
+					<sequence>
+						<element maxOccurs="unbounded" name="getElementsReturn" type="tns2:CensusService"/>
+					</sequence>
+				</complexType>
+			</element>
+			<!--
+			<element name="getNumElements">
+				<complexType/>
+			</element>
+			-->
+			<element name="getNumElementsResponse">
+				<complexType>
+					<sequence>
+						<element name="getNumElementsReturn" type="xsd:int"/>
+					</sequence>
+				</complexType>
+			</element>
+		</schema>
+
+		<schema elementFormDefault="qualified" targetNamespace="org.jamesward.census" 
+			xmlns="http://www.w3.org/2001/XMLSchema">
+
+			<complexType name="CensusService">
+				<sequence>
+					<element name="age" type="xsd:int"/>
+					<element name="classOfWorker" nillable="true" type="xsd:string"/>
+					<element name="education" nillable="true" type="xsd:string"/>
+					<element name="id" type="xsd:int"/>
+					<element name="maritalStatus" nillable="true" type="xsd:string"/>
+					<element name="race" nillable="true" type="xsd:string"/>
+					<element name="sex" nillable="true" type="xsd:string"/>
+				</sequence>
+			</complexType>
+		</schema>
+
+	</wsdl:types>
+
+	<wsdl:message name="getNumElementsRequest">
+		<wsdl:part element="tns1:getNumElements" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="getElementsResponse">
+		<wsdl:part element="tns1:getElementsResponse" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="getElementsRequest">
+		<wsdl:part element="tns1:getElements" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="getNumElementsResponse">
+		<wsdl:part element="tns1:getNumElementsResponse" name="parameters">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:portType name="CensusService">
+		<wsdl:operation name="getElements">
+			<wsdl:input message="impl:getElementsRequest" name="getElementsRequest">
+			</wsdl:input>
+			<wsdl:output message="impl:getElementsResponse" name="getElementsResponse">
+			</wsdl:output>
+		</wsdl:operation>
+		<!--
+		<wsdl:operation name="getNumElements">
+			<wsdl:input message="impl:getNumElementsRequest" name="getNumElementsRequest">
+			</wsdl:input>
+			<wsdl:output message="impl:getNumElementsResponse" name="getNumElementsResponse">
+			</wsdl:output>
+		</wsdl:operation>
+		-->
+	</wsdl:portType>
+	<wsdl:binding name="CensusServiceSoapBinding" type="impl:CensusService">
+		<wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="getElements">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="getElementsRequest">
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output name="getElementsResponse">
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--
+		<wsdl:operation name="getNumElements">
+			<wsdlsoap:operation soapAction=""/>
+			<wsdl:input name="getNumElementsRequest">
+				<wsdlsoap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output name="getNumElementsResponse">
+				<wsdlsoap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		-->
+	</wsdl:binding>
+	<wsdl:service name="CensusServiceService">
+		<wsdl:port binding="impl:CensusServiceSoapBinding" name="CensusService">
+			<wsdlsoap:address location="http://www.jamesward.org/census/services/CensusService"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
