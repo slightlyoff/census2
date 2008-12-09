@@ -1,0 +1,62 @@
+<!--
+Copyright (C) 2007 James Ward
+http://www.jamesward.org
+
+Updated, Alex Russell, 2008
+http://alex.dojotoolkit.org
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+-->
+<html>
+	<head>
+		<link rel="stylesheet" href="resources/main.css" type="text/css">
+		<script type="text/javascript" src="dojo/dojo/dojo.js"></script>
+		<script type="text/javascript" src="dojo/dojo/cookie.js"></script>
+		<script type="text/javascript" src="resources/timing.js"></script>
+		<script type="text/javascript" src="dojo/dojox/embed/Flash.js"></script>
+		<script type="text/javascript">
+			dojo.require("dojo.cookie");
+			dojo.require("dojox.embed.Flash");
+
+			dojo.addOnLoad(function(){
+				var url = new dojo._Url(window.location);
+				var rows = 5000;
+				if(url.query){
+					rows = dojo.queryToObject(url.query).rows||rows;
+				}
+				var movie = new dojox.embed.Flash({
+						width: "100%",
+						height: "100%",
+						vars: {
+							rows: rows
+						},
+						path: "./resources/flex/flex_soap_as.swf"
+					},
+					"grid"
+				);
+				dojo.connect(movie, "onLoad", function(){
+					var mm = movie.movie;
+					if(mm.IsPlaying && !mm.IsPlaying() && !dojo.isSafari){
+						mm.Play();
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<div id="grid">
+		</div>
+	</body>
+</html>
