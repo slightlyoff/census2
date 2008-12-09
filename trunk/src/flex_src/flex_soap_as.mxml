@@ -70,9 +70,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 	]]>
 	</mx:Script>
 
-	<mx:WebService id="srv" wsdl="webservices/CensusService?wsdl" 
-		load="handleLoad()" result="parseDone()">
+	<mx:WebService
+		id="srv"
+		wsdl="../../c2.wsdl.xml" 
+		load="handleLoad()"
+		result="parseDone()">
+
 		<mx:operation name="getElements"/>
+
 	</mx:WebService>
 
 	<mx:DataGrid 
@@ -82,12 +87,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		updateComplete="done()">
 		<mx:columns>
 			<mx:DataGridColumn dataField="itemId" />
-			<mx:DataGridColumn dataField="age"/>
-			<mx:DataGridColumn dataField="classOfWorker"/>
-			<mx:DataGridColumn dataField="education"/>
-			<mx:DataGridColumn dataField="maritalStatus"/>
-			<mx:DataGridColumn dataField="race"/>
-			<mx:DataGridColumn dataField="sex"/>
+			<mx:DataGridColumn dataField="age" />
+			<mx:DataGridColumn dataField="classOfWorker" />
+			<mx:DataGridColumn dataField="education" />
+			<mx:DataGridColumn dataField="maritalStatus" />
+			<mx:DataGridColumn dataField="race" />
+			<mx:DataGridColumn dataField="sex" />
 		</mx:columns>
 	</mx:DataGrid>
 
