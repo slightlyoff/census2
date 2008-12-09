@@ -45,7 +45,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		private function initApp():void {
 			rows = new Number(parameters.rows);
 			ExternalInterface.call("timing.tic", "transferTime");
-			srv.send({output: "json", count: rows});
+			srv.send({ output: "json", count: rows });
 			srv.channelSet.messageAgents[0].addEventListener('acknowledge', loadDone);
 			started = true;
 		}
@@ -65,6 +65,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 		private function handleResult():void {
 			var s:String = srv.lastResult.toString();
+			ExternalInterface.call("timing.size", "bandwidth", s.length);
 			s = s.replace(/\n/g, "");
 			s = s.replace(/\r/g, "");
 			ExternalInterface.call("timing.tic", "parseTime");
@@ -92,3 +93,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		</mx:columns>
 	</mx:DataGrid>
 </mx:Application>
+<!--
+vim:ts=4:shiftwidth=4:noet:
+-->
