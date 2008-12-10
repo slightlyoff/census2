@@ -335,3 +335,20 @@ code {
 	border: none;
 	font-size: 0.9em;
 }
+
+.census .arrow {
+	font-family: Webdings;
+	font-size: 1.5em;
+	border: none;
+	background-image: none;
+}
+.census .arrow .dijitButton,
+.census .arrow .dijitButtonNode {
+	border: none;
+	background-image: none;
+	background-color: transparent;
+}
+
+.census .arrow .dijitButtonHover {
+	color: #2a2a2a;
+}
