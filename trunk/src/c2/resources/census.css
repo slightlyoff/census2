@@ -337,7 +337,7 @@ code {
 }
 
 .census .arrow {
-	font-family: Webdings;
+	font-family: "Webdings 3";
 	font-size: 1.5em;
 	border: none;
 	background-image: none;
@@ -372,12 +372,19 @@ code {
 }
 
 /* FIXME: need to get hover color set right */
+.census .runAllButton.dijitButtonHover .dijitButtonNode {
+	background-color: transparent;
+	color: inherit;
+}
+
 .census .runAllButton.dijitButtonHover {
 	background-color: #363636;
 	color: #b8b8b8;
 }
 
 .census select {
+	border: 1px solid #b8b8b8;
+	border: 1px solid #1a1a1a;
 	color: #b8b8b8;
 	background-color: #363636;
 }
