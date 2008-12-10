@@ -576,8 +576,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				<button dojoType="dijit.form.Button" onClick="runSelected(true);">
 					Run 'Em All
 				</button>
-				<button dojoType="dijit.form.Button" onClick="runSelected(true);">
-					Run Next
+				<br>
+				<button dojoType="dijit.form.Button" onClick="runSelected(true);" class="arrow">
+					&#051;
+				</button>
+				<select id="testListDropDown" style="width: 150px;">
+					<option value="default">Census - Guide Me</option>
+				</select>
+				<button dojoType="dijit.form.Button" onClick="runSelected();" class="arrow">
+					&#052;
 				</button>
 				<table style="text-align: right;">
 					<tr><td>Rows:</td>
@@ -643,9 +650,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 						runTests([ t ]);
 					});
 				</script>
-				<select id="testListDropDown">
-					<option value="default">Census - Guide Me</option>
-				</select>
 				<h4 id="guideTitle"></h4>
 				<br>
 				<div id="guideDetail"></div>
