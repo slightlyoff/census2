@@ -572,20 +572,35 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			style="width: 270px;" class="mainPane leftContainer">
 
 			<!-- the "Guide Me" UI -->
-			<div dojoType="dijit.layout.ContentPane" title="Guide Me">
+			<div dojoType="dijit.layout.ContentPane" title="Guide Me"
+				jsId="guideMePane">
 				<button dojoType="dijit.form.Button" onClick="runSelected(true);" 
 					class="runAllButton">
 					Run 'Em All
 				</button>
 				<br>
-				<button dojoType="dijit.form.Button" onClick="runSelected(true);" class="arrow">
-					&#051;
+				<button dojoType="dijit.form.Button" class="arrow">
+					<script type="dojo/connect" event="onClick">
+						runSelected();
+						console.debug("run prev");
+						$("#testListDropDown").
+							map("return item.options[Math.max(item.selectedIndex-1, 0)]").
+							attr("selected", true);
+						guideMePane.runSelectedTest();
+					</script>
+					&#9664;
 				</button>
 				<select id="testListDropDown" style="width: 150px;">
 					<option value="default">Census - Guide Me</option>
 				</select>
-				<button dojoType="dijit.form.Button" onClick="runSelected();" class="arrow">
-					&#052;
+				<button dojoType="dijit.form.Button" class="arrow">
+					<script type="dojo/connect" event="onClick">
+						$("#testListDropDown").
+							map("return item.options[item.selectedIndex+1]").
+							attr("selected", true);
+						guideMePane.runSelectedTest();
+					</script>
+					&#9658;
 				</button>
 				<table style="text-align: right;">
 					<tr><td>Rows:</td>
@@ -639,8 +654,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 							dojo.place(o, "testListDropDown", "last");
 						});
 					});
-					// when it changes, run the next test and show different summary data
-					$("#testListDropDown").connect("onchange", function(){
+
+					this.runSelectedTest = dojo.hitch($("#testListDropDown")[0], function(){
 						if(this.value == "default"){
 							cp.setDefaults();
 						}
@@ -650,6 +665,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 						$("#guideDetail").xhr(t.longDescUrl);
 						runTests([ t ]);
 					});
+					// when it changes, run the next test and show different summary data
+
+					$("#testListDropDown").connect("onchange", this, "runSelectedTest");
 				</script>
 				<h4 id="guideTitle"></h4>
 				<br>
