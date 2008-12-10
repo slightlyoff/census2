@@ -342,13 +342,42 @@ code {
 	border: none;
 	background-image: none;
 }
+
 .census .arrow .dijitButton,
 .census .arrow .dijitButtonNode {
 	border: none;
+	padding: 0px;
+	margin: 0px;
 	background-image: none;
 	background-color: transparent;
 }
 
 .census .arrow .dijitButtonHover {
-	color: #2a2a2a;
+	color: #b8b8b8;
+}
+
+
+.census .runAllButton {
+	color: #b8b8b8;
+	font-size: 1.2em;
+	width: 90%;
+	background-image: none;
+}
+
+.census .runAllButton .dijitButton,
+.census .runAllButton .dijitButtonNode {
+	border: none;
+	background-image: none;
+	background-color: transparent;
+}
+
+/* FIXME: need to get hover color set right */
+.census .runAllButton.dijitButtonHover {
+	background-color: #363636;
+	color: #b8b8b8;
+}
+
+.census select {
+	color: #b8b8b8;
+	background-color: #363636;
 }

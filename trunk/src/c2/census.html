@@ -573,7 +573,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 			<!-- the "Guide Me" UI -->
 			<div dojoType="dijit.layout.ContentPane" title="Guide Me">
-				<button dojoType="dijit.form.Button" onClick="runSelected(true);">
+				<button dojoType="dijit.form.Button" onClick="runSelected(true);" 
+					class="runAllButton">
 					Run 'Em All
 				</button>
 				<br>
@@ -624,6 +625,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 					$("#guideDetail").xhr("descriptions/intro.html");
 				</script>
 				<script type="dojo/method">
+					var cp = this;
 					this.setDefaults();
 					// fill in the drop down list of tests
 					dojo.connect("setTestList", function(){
@@ -638,10 +640,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 						});
 					});
 					// when it changes, run the next test and show different summary data
-					$("#testListDropDown").connect("onchange", this, function(){
-						// console.dir(this);
+					$("#testListDropDown").connect("onchange", function(){
 						if(this.value == "default"){
-							this.setDefaults();
+							cp.setDefaults();
 						}
 						var t = testsByFile(this.value)[0];
 						if(!t){ return; }
@@ -657,7 +658,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 			<!-- the "Navigator" UI -->
 			<div dojoType="dijit.layout.ContentPane" title="Navigator" class="tests">
-				<button dojoType="dijit.form.Button" onClick="runSelected();">
+				<button dojoType="dijit.form.Button" onClick="runSelected();" 
+					class="runAllButton">
 					Run Selected Tests
 				</button>
 				<table class="censusTable" cellspacing="0">
