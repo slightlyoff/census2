@@ -287,14 +287,19 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				maximum: tl.length
 			});
 			dojo.forEach(tl, function(t, idx){
-				t.addBoth(function(){
+				t.addBoth(function(e){
 					progress.update({
 						"progress": idx+1
 					});
+					return e;
 				});
 			});
+			tl[tl.length-1].addBoth(testsDone);
 			first.callback(true);
 		}
+
+		// stub to connect to
+		testsDone = function(e){ return e; }
 
 		reportResults = function(file, properties){
 			if(!testList){ return; }
@@ -587,6 +592,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 							map("return item.options[Math.max(item.selectedIndex-1, 0)]").
 							attr("selected", true);
 						guideMePane.runSelectedTest();
+						this.attr("disabled", true);
 					</script>
 					&#9664;
 				</button>
@@ -599,6 +605,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 							map("return item.options[item.selectedIndex+1]").
 							attr("selected", true);
 						guideMePane.runSelectedTest();
+						this.attr("disabled", true);
 					</script>
 					&#9658;
 				</button>
