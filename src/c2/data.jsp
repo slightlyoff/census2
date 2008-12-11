@@ -126,6 +126,22 @@
 	}
 
 	//////////////////////////////////////
+	//	JSON COMPACT
+	//
+	if(output.equals("json-compact")){
+		response.setContentType("text/plain");
+
+%>
+[
+<c:forEach var="item" items="${items}" varStatus="itemStatus">[
+"<c:out value="${item.id}" escapeXml="false" />", "<c:out value="${item.age}" escapeXml="false" />", "<c:out value="${item.class}" escapeXml="false" />", "<c:out value="${item.education}" escapeXml="false" />", "<c:out value="${item.maritalStatus}" escapeXml="false" />", "<c:out value="${item.race}" escapeXml="false" />", "<c:out value="${item.sex}" escapeXml="false" />" 
+],</c:forEach>
+	[]
+]
+<%
+	}
+
+	//////////////////////////////////////
 	//	HTML
 	//
 	if(output.equals("html")){

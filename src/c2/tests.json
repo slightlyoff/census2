@@ -24,6 +24,12 @@
 		"longDescUrl": "descriptions/ajax_json.html"
 	},
 	{
+		"name": "Ajax: JSON (Compact)",
+		"desc": "JSON to HTML table",
+		"file": "ajax_json_compact.html",
+		"longDescUrl": "descriptions/ajax_json.html"
+	},
+	{
 		"disabled": true,
 		"name": "Ajax: SOAP",
 		"desc": "SOAP to HTML table",
