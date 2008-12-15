@@ -133,6 +133,10 @@
 
 %>
 [
+	[ 
+		"id", "age", "class", "education", "maritalStatus", 
+		"race", "sex", "class", "maritalStatus"
+	], 
 <c:forEach var="item" items="${items}" varStatus="itemStatus">[
 "<c:out value="${item.id}" escapeXml="false" />", "<c:out value="${item.age}" escapeXml="false" />", "<c:out value="${item.class}" escapeXml="false" />", "<c:out value="${item.education}" escapeXml="false" />", "<c:out value="${item.maritalStatus}" escapeXml="false" />", "<c:out value="${item.race}" escapeXml="false" />", "<c:out value="${item.sex}" escapeXml="false" />" 
 ],</c:forEach>
@@ -170,6 +174,30 @@
 
 	//////////////////////////////////////
 	//	XML
+	//
+	if(output.equals("xml")){
+		response.setContentType("text/xml");
+%><?xml version="1.0" encoding="UTF-8"?>
+
+<list>
+	<c:forEach var="item" items="${items}" varStatus="itemStatus">
+		<item>
+			<itemId><c:out value="${item.id}" /></itemId>
+			<age><c:out value="${item.age}" /></age>
+			<classOfWorker><c:out value="${item.class}" /></classOfWorker>
+			<education><c:out value="${item.education}" /></education>
+			<maritalStatus><c:out value="${item.maritalStatus}" /></maritalStatus>
+			<race><c:out value="${item.race}" /></race>
+			<sex><c:out value="${item.sex}" /></sex>
+		</item>
+	</c:forEach>
+</list>
+<%
+	}
+
+
+	//////////////////////////////////////
+	//	SOAP
 	//
 	if(output.equals("xml")){
 		response.setContentType("text/xml");

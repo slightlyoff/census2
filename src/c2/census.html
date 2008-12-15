@@ -276,8 +276,18 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 		}
 
 		runTests = function(tests){
+			//	summary:
+			//		runs each test in the list sequentially, hooking up the
+			//		progress bar updates and finalization code. Returns a
+			//		Deferred object which calls back once all the tests have
+			//		been run.
 			var first = new dojo.Deferred();
+			var ret = new dojo.Deferred();
 			var tl = [ first ];
+			// NOTE:
+			//		tests actually register themselves. We drive their
+			//		"testInit" and "addTests" methods externally, passing in the
+			//		current list of tests to be added to.
 			dojo.forEach(tests, function(t){
 				t.testInit();
 				t.addTests(tl);
@@ -294,8 +304,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 					return e;
 				});
 			});
-			tl[tl.length-1].addBoth(testsDone);
+			var last = tl[tl.length-1];
+			last.addBoth(testsDone);
+			last.addCallback(ret, "callback");
+			last.addErrback(ret, "errback");
 			first.callback(true);
+			return ret; // dojo.Deferred
 		}
 
 		// stub to connect to
@@ -578,7 +592,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 			<!-- the "Guide Me" UI -->
 			<div dojoType="dijit.layout.ContentPane" title="Guide Me"
-				jsId="guideMePane">
+				jsId="guideMePane" class="guideMe">
 				<button dojoType="dijit.form.Button" onClick="runSelected(true);" 
 					class="runAllButton">
 					Run 'Em All
@@ -591,7 +605,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 						$("#testListDropDown").
 							map("return item.options[Math.max(item.selectedIndex-1, 0)]").
 							attr("selected", true);
-						guideMePane.runSelectedTest();
+
+						guideMePane.runSelectedTest().
+							addCallback(this, function(){ this.attr("disabled", false); });
+
 						this.attr("disabled", true);
 					</script>
 					&#9664;
@@ -604,7 +621,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 						$("#testListDropDown").
 							map("return item.options[item.selectedIndex+1]").
 							attr("selected", true);
-						guideMePane.runSelectedTest();
+
+						guideMePane.runSelectedTest().
+							addCallback(this, function(){ this.attr("disabled", false); });
+
 						this.attr("disabled", true);
 					</script>
 					&#9658;
@@ -670,7 +690,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 						if(!t){ return; }
 						$("#guideTitle").html(t.desc);
 						$("#guideDetail").xhr(t.longDescUrl);
-						runTests([ t ]);
+						return runTests([ t ]); // dojo.Deferred
 					});
 					// when it changes, run the next test and show different summary data
 
@@ -744,11 +764,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				</script>
 
 				<div id="perfLegendNode" style="width: 100%; height: 50px;"></div>
-				<div id="perfChartNode" style="width: 100%; height: 300px;"></div>
+				<div id="perfChartNode" style="width: 100%; height: 350px;"></div>
 				<div id="bandLegendNode" style="width: 100%; height: 50px;"></div>
-				<div id="bandChartNode" style="width: 100%; height: 300px;"></div>
+				<div id="bandChartNode" style="width: 100%; height: 350px;"></div>
 				<div id="totalTimeLegendNode" style="width: 100%; height: 50px;"></div>
-				<div id="totalTimeChartNode" style="width: 100%; height: 300px;"></div>
+				<div id="totalTimeChartNode" style="width: 100%; height: 350px;"></div>
 				<script type="dojo/connect" event="resize" args="size">
 					// resize the charts if our outer size changes
 					if(this._resizeTimer){
@@ -757,9 +777,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 					if(perfChart && perfChart.resize){
 						// keep the height but change the width
 						this._resizeTimer = setTimeout(function(){
-							perfChart.resize(size.w-10, 300);
-							bandChart.resize(size.w-10, 300);
-							totalTimeChart.resize(size.w-10, 300);
+							perfChart.resize(size.w-10, 350);
+							bandChart.resize(size.w-10, 350);
+							totalTimeChart.resize(size.w-10, 350);
 						}, 100);
 					}
 				</script>
@@ -908,5 +928,5 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 </body>
 </html>
 <!--
-vim:noet:ts=4:sw=4:
+vim:noet:ts=4:sw=4:ai:ci:
 -->

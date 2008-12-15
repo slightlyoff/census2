@@ -11,8 +11,8 @@ body, #main {
 	background-color: black;
 }
 
-#main {
-	 padding: 10px;
+#main { 
+	padding: 10px;
 }
 
 a {
@@ -356,6 +356,10 @@ code {
 	color: #b8b8b8;
 }
 
+.census .arrow .dijitButtonText {
+	padding: 0px;
+}
+
 
 .census .runAllButton {
 	color: #b8b8b8;
@@ -372,12 +376,12 @@ code {
 }
 
 /* FIXME: need to get hover color set right */
-.census .runAllButton.dijitButtonHover .dijitButtonNode {
+.census .guideMe .dijitButtonHover .dijitButtonNode {
 	background-color: transparent;
 	color: inherit;
 }
 
-.census .runAllButton.dijitButtonHover {
+.census .guideMe .dijitButtonHover {
 	background-color: #363636;
 	color: #b8b8b8;
 }
