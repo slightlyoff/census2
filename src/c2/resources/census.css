@@ -324,6 +324,7 @@ table.rawData tfoot td {
 }
 
 .census .testSpinner input {
+	color: #b8b8b8;
 	border: none;
 }
 
@@ -351,7 +352,9 @@ code {
 }
 
 .census .arrow .dijitButton,
-.census .arrow .dijitButtonNode {
+.census .arrow .dijitButtonNode,
+.census .arrow .dijitButtonNode button {
+	color: #b8b8b8;
 	border: none;
 	padding: 0px;
 	margin: 0px;
@@ -376,7 +379,9 @@ code {
 }
 
 .census .runAllButton .dijitButton,
-.census .runAllButton .dijitButtonNode {
+.census .runAllButton .dijitButtonNode,
+.census .runAllButton .dijitButtonNode button {
+	color: #b8b8b8;
 	border: none;
 	background-image: none;
 	background-color: transparent;
