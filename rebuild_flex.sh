@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FLEX_OUT_DIR=`pwd`/src/c2/rsources/flex
+FLEX_OUT_DIR=`pwd`/src/c2/resources/flex
 echo $FLEX_OUT_DIR
 
 echo "	starting Flex build"
