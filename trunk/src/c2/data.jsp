@@ -199,7 +199,7 @@
 	//////////////////////////////////////
 	//	SOAP
 	//
-	if(output.equals("xml")){
+	if(output.equals("xml-soap")){
 		response.setContentType("text/xml");
 %><?xml version="1.0" encoding="UTF-8"?>
 
