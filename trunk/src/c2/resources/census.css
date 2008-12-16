@@ -204,14 +204,17 @@ a {
 }
 
 .census .dijitTooltipContainer {
+	background: #363636;
 	border: 1px solid #2a2a2a;
+	color: #a9a9a9;
+	font-size: normal;
 	/* border: 1px solid black; */
 	/* border: 1px solid #a9a9a9; */
 	-moz-border-radius: 4px;
+}
+
+.dj_safari .census .dijitTooltipContainer {
 	-webkit-border-radius: 4px;
-	background: #363636;
-	color: #a9a9a9;
-	font-size: normal;
 	/* background: -webkit-gradient(linear, left top, left bottom, from(#363636), to(#151515)); */
 	background: -webkit-gradient(linear, 0% 20%, left bottom, from(#2c2c2c), to(#151515));
 	-webkit-background-origin: border;
