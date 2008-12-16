@@ -3,7 +3,7 @@
 DOJO_VERSION=1.2.3
 FLEX_VERSION=3.1.0.2710
 FLEX_SDK_NAME="flex_sdk_"$FLEX_VERSION"_mpl.zip"
-FLEX_OUT_DIR=`pwd`/src/c2/rsources/flex
+FLEX_OUT_DIR=`pwd`/src/c2/resources/flex
 
 # export _JAVA_OPTIONS="-Xms512m -Xmx1g"
 
