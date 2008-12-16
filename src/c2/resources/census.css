@@ -42,7 +42,8 @@ a {
 }
 
 .census .dijitProgressBarEmpty {
-	background: none #1a1a1a;
+	background-color: #1a1a1a;
+	background-image: none;
 }
 
 .census .dijitProgressBarFull {
@@ -52,6 +53,9 @@ a {
 .census .dijitProgressBarTile {
 	height: 6px;
 	-moz-border-radius: 3px;
+}
+
+.dj_safari .census .dijitProgressBarTile {
 	-webkit-border-radius: 3px;
 	background: -webkit-gradient(linear, 0% 30%, 0% 100%, from(#d5d5d5), to(#464646));
 	-webkit-background-origin: border;
