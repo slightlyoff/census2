@@ -365,10 +365,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				majorLabels: true, 
 				minorLabels: true, 
 				includeZero: true, 
-				minorTicks: false, 
+				minorTicks: true, 
 				microTicks: false, 
 				htmlLabels: true,
-				fixUpper: "major", fixLower: "major", 
+				fixUpper: "minor", fixLower: "minor", 
+				minorTick: { length: 3, color: "black" },
 				majorTick: { length: 3 }
 			};
 
@@ -381,6 +382,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				htmlLabels: true, // and use HTML to do it so we get the right fonts and such
 				includeZero: false, // don't include the 0th item 
 				majorTick: { length: 0 }, // and squelch those unsightly tick marks
+				minorTick: { length: 0 }, // and squelch those unsightly tick marks
 				labels: dojo.map(testList, "return { value: index+1, text: item.name };")
 			};
 
@@ -389,7 +391,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			perfChart = new dojox.charting.Chart2D("perfChartNode").
 				setTheme(DarkHorse).
 				addAxis("x", dojo.delegate(xAxisConfig, { 
-					majorTickStep: 500, // show every 500ms
+					majorTickStep: 5000, // show every 10s
+					minorTickStep: 100, // show every 500ms if that makes sense
 					maxLabelSize: 50,
 					labelFunc: getTimeLabel
 				})).
@@ -473,7 +476,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				setTheme(DarkHorse).
 				addAxis("y", yAxisConfig).
 				addAxis("x", dojo.delegate(xAxisConfig, { 
-					majorTickStep: 102400, // show every 100K
+					majorTickStep: 1048576, // show every 1MB 
+					minorTickStep: 102400, // show every 100K
 					maxLabelSize: 50,
 					labelFunc: getDataLabel
 				})).
