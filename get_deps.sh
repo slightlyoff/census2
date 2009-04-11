@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DOJO_VERSION=1.2.3
+DOJO_VERSION=1.3.0
 FLEX_VERSION=3.1.0.2710
 FLEX_SDK_NAME="flex_sdk_"$FLEX_VERSION"_mpl.zip"
 FLEX_OUT_DIR=`pwd`/src/c2/resources/flex
@@ -58,11 +58,11 @@ then
 	fi
 
 	echo "	copying in updated Dojo Charting..."		
-	rm -rf dojo_src/dojox/charting		
-	rm -rf dojo_src/dojox/lang
-	cp -r dojo_patches/charting dojo_src/dojox/	
-	cp -r dojo_patches/lang dojo_src/dojox/	
-	cp dojo_patches/embed/Flash.js dojo_src/dojox/embed/Flash.js
+	# rm -rf dojo_src/dojox/charting		
+	# rm -rf dojo_src/dojox/lang
+	# cp -r dojo_patches/charting dojo_src/dojox/	
+	# cp -r dojo_patches/lang dojo_src/dojox/	
+	# cp dojo_patches/embed/Flash.js dojo_src/dojox/embed/Flash.js
 	echo "	...done"		
 
 	echo "	creating Dojo build against custom layer"
@@ -71,7 +71,7 @@ then
 
 	echo "" > copyright_mini.txt
 
-	_JAVA_OPTIONS="-Xms512m -Xmx1g" ./build_mini.sh action=clean,release profileFile=../../../census.profile.js
+	_JAVA_OPTIONS="-Xms512m -Xmx1g" ./build.sh mini=true cssOptimize=comments expandProvide=true action=clean,release profileFile=../../../census.profile.js
 	echo "	...done"
 
 	echo "	moving Dojo build into place"
