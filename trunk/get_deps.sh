@@ -58,11 +58,8 @@ then
 	fi
 
 	echo "	copying in updated Dojo Charting..."		
-	# rm -rf dojo_src/dojox/charting		
-	# rm -rf dojo_src/dojox/lang
-	# cp -r dojo_patches/charting dojo_src/dojox/	
-	# cp -r dojo_patches/lang dojo_src/dojox/	
-	# cp dojo_patches/embed/Flash.js dojo_src/dojox/embed/Flash.js
+	rm -rf dojo_src/dojox/charting		
+	cp -r dojo_patches/charting dojo_src/dojox/	
 	echo "	...done"		
 
 	echo "	creating Dojo build against custom layer"
