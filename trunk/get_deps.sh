@@ -38,7 +38,7 @@ if [[ ! -d $FLEX_OUT_DIR ]]
 then
 	mkdir -p $FLEX_OUT_DIR
 	LWD=`pwd`
-	cd src/flex_sdk
+	cd src/flex_src
 	./build.sh
 	cd $LWD
 fi
