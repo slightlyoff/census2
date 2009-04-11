@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DOJO_VERSION=1.3.0
-FLEX_VERSION=3.1.0.2710
+FLEX_VERSION=3.3.0.4589
 FLEX_SDK_NAME="flex_sdk_"$FLEX_VERSION"_mpl.zip"
 FLEX_OUT_DIR=`pwd`/src/c2/resources/flex
 
