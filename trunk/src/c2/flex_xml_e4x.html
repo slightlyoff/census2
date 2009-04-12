@@ -48,8 +48,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				);
 				dojo.connect(movie, "onLoad", function(){
 					var mm = movie.movie;
-					if(mm.IsPlaying && !mm.IsPlaying()){
-						mm.Play();
+					try{
+						if(mm.IsPlaying && !mm.IsPlaying() && !dojo.isSafari){
+							mm.Play();
+						}
+					}catch(e){ 
+						// crazy hacks for IE 6
+						try{
+							mm.Play();
+						}catch(e2){ /*squelch*/ }
 					}
 				});
 			});
