@@ -48,7 +48,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 				);
 				dojo.connect(movie, "onLoad", function(){
 					var mm = movie.movie;
-					if(mm.IsPlaying && !mm.IsPlaying() && !dojo.isSafari){
+					if(mm.IsPlaying && !mm.IsPlaying() && !dojo["isSafari"]){
 						mm.Play();
 					}
 				});
