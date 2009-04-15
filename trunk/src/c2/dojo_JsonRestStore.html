@@ -1,0 +1,116 @@
+<!--
+Copyright (C) Alex Russell, 2008
+http://alex.dojotoolkit.org
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+-->
+<html>
+	<head>
+		<!--
+		<link rel="stylesheet" href="resources/main.css" type="text/css">
+		-->
+		<link rel="stylesheet" href="dojo/dijit/themes/dijit.css" type="text/css">
+		<link rel="stylesheet" href="dojo/dojox/grid/resources/tundraGrid.css" type="text/css">
+		<script type="text/javascript" src="dojo/dojo/dojo.js" djConfig="parseOnLoad: true"></script>
+		<script type="text/javascript" src="dojo/dojo/cookie.js"></script>
+		<script type="text/javascript" src="resources/timing.js"></script>
+		<!-- script include things to improve performance/parallelism -->
+		<script type="text/javascript" src="dojo/dijit/dijit.js"></script>
+		<script type="text/javascript" src="dojo/dojox/grid/DataGrid.js"></script>
+		<script type="text/javascript">
+			dojo.require("dojo.cookie");
+			dojo.require("dijit.dijit");
+			dojo.require("dojox.grid.DataGrid");
+			dojo.require("dojox.data.JsonRestStore");
+			dojo.addOnLoad(function(){
+				try{
+					var url = new dojo._Url(window.location);
+					var rows = 5000;
+					if(url.query){
+						rows = dojo.queryToObject(url.query).rows||rows;
+					}
+					dGrid.setStore(censusStore, {
+						age: '*',
+						total: rows
+					});
+				}catch(e){ console.error(e); }
+			});
+		</script>
+	</head>
+	<body class="tundra">
+		<div jsId="censusStore" dojoType="dojox.data.JsonRestStore" 
+			target="/jsonrest/" requestMethod="get">
+			<script type="dojo/method">
+				var oldDoQuery = this._doQuery;
+				this._doQuery = function(args){
+					console.debug(args);
+					var r = oldDoQuery.apply(this, arguments);
+					// dirty hack to get into the XHR callback chain
+					var rawHandlers = r.chain[0];
+					var oldSuccess = rawHandlers[0];
+					rawHandlers[0] = function(dfd){
+						timing.size("bandwidth", dfd.ioArgs.xhr.responseText);
+						var tt = timing.toc("transferTime");
+						var st = parseInt(dojo.cookie("serverExecTime"));
+						timing.setTime("serverExecTime", st);
+						timing.setTime("transferTime", tt-st);
+						timing.tic("parseTime");
+						var ret = oldSuccess.apply(this, arguments);
+						return ret;
+					};
+					return r;
+				};
+
+				var oldFetch = this.fetch;
+				this.fetch = function(request){
+					// adapt the query to suit our back-end
+
+					// hook into the onComplete to collect timings
+					var oc = request.onComplete;
+					request.onComplete = function(){
+						timing.toc("parseTime");
+						timing.toc("renderTime");
+						return oc.apply(this, arguments);
+					};
+					// we know that things will start rendering when they get
+					// their onComplete, so we wait for the end of already
+					// registered listeners
+					dojo.connect(request, "onComplete", function(){ 
+						timing.toc("renderTime");
+						timing.report();
+					});
+					// go get the data!
+					timing.tic("transferTime");
+					return oldFetch.call(this, request); 
+				};
+			</script>
+		</div>
+		<table dojoType="dojox.grid.DataGrid" jsId="dGrid"
+			style="width: 100%; height: 100%;"
+			width="100%" height="100%">
+			<thead>
+				<tr>
+					<th>id</th>
+					<th>age</th>
+					<th>class</th>
+					<th>education</th>
+					<th>maritalStatus</th>
+					<th>race</th>
+					<th>sex</th>
+				</tr>
+			</thead>
+		</table>
+	</body>
+</html>
