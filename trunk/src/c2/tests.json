@@ -29,6 +29,7 @@
 		"file": "ajax_json_compact.html",
 		"longDescUrl": "descriptions/ajax_json.html"
 	},
+	/*
 	{
 		"disabled": true,
 		"name": "Ajax: SOAP",
@@ -36,6 +37,7 @@
 		"file": "ajax_soap.html",
 		"longDescUrl": "descriptions/intro.html"
 	},
+	*/
 	{
 		"name": "Dojo: JSON",
 		"desc": "JSON to Dojo Grid",
@@ -49,11 +51,18 @@
 		"longDescUrl": "descriptions/dojo_QueryReadStore.html"
 	},
 	{
+		"name": "Dojo: JRS",
+		"desc": "Dojo Grid via JsonRestStore",
+		"file": "dojo_JsonRestStore.html",
+		"longDescUrl": "descriptions/intro.html"
+	},
+	{
 		"name": "Flex: JSON",
 		"desc": "JSON to ActionScript objects",
 		"file": "flex_json.html",
 		"longDescUrl": "descriptions/intro.html"
 	},
+	/*
 	{
 		"disabled": true,
 		"name": "Flex: SOAP AS",
@@ -68,6 +77,7 @@
 		"file": "flex_soap_e4x.html",
 		"longDescUrl": ""
 	},
+	*/
 	{
 		"name": "Flex: XML AS",
 		"desc": "XML to ActionScript objects",
@@ -79,7 +89,7 @@
 		"desc": "XML to E4X objects",
 		"file": "flex_xml_e4x.html",
 		"longDescUrl": "descriptions/intro.html"
-	},
+	}/* ,
 	{
 		"disabled": true,
 		"name": "Flex: AMF3",
@@ -94,4 +104,5 @@
 		"file": "flex_paged.html",
 		"longDescUrl": ""
 	}
+	*/
 ]

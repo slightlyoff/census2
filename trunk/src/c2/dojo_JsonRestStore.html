@@ -55,7 +55,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 			<script type="dojo/method">
 				var oldDoQuery = this._doQuery;
 				this._doQuery = function(args){
-					console.debug(args);
 					var r = oldDoQuery.apply(this, arguments);
 					// dirty hack to get into the XHR callback chain
 					var rawHandlers = r.chain[0];
