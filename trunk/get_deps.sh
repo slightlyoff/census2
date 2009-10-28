@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DOJO_VERSION=1.3.0
+DOJO_VERSION=1.4.0b2
 FLEX_VERSION=3.3.0.4589
 FLEX_SDK_NAME="flex_sdk_"$FLEX_VERSION"_mpl.zip"
 FLEX_OUT_DIR=`pwd`/src/c2/resources/flex
@@ -57,10 +57,10 @@ then
 
 	fi
 
-	echo "	copying in updated Dojo Charting..."		
-	rm -rf dojo_src/dojox/charting		
-	cp -r dojo_patches/charting dojo_src/dojox/	
-	echo "	...done"		
+	# echo "	copying in updated Dojo Charting..."		
+	# rm -rf dojo_src/dojox/charting		
+	# cp -r dojo_patches/charting dojo_src/dojox/	
+	# echo "	...done"		
 
 	echo "	creating Dojo build against custom layer"
 
